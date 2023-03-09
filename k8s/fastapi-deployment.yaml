@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webregi-v2-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webregi-v2-app
+  template:
+    metadata:
+      labels:
+        app: webregi-v2-app
+    spec:
+      containers:
+      - name: webregi-v2-app
+        image: banderosik/banderachat-backend:v1.0.0
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+          env:
+          - name: DATABASE_HOST
+            valueFrom:
+              secretKeyRef:
+                name: banderachat-secrets
+                key: DATABASE_HOST
+          - name: DATABASE_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: banderachat-secrets
+                key: DATABASE_USERNAME
+          - name: DATABASE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: banderachat-secrets
+                key: DATABASE_PASSWORD
+          - name: DATABASE
+            valueFrom:
+              secretKeyRef:
+                name: banderachat-secrets
+                key: DATABASE
+          - name: DATABASE_SOCKET
+            valueFrom:
+              secretKeyRef:
+                name: banderachat-secrets
+                key: DATABASE_SOCKET
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: webregi-v2-service
+spec:
+  replicas: 1
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
+  selector:
+    app: webregi-v2-app

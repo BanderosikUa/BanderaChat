@@ -1,0 +1,25 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: alembic-migrate
+spec:
+  template:
+    spec:
+      containers:
+        - name: webregi-v2-app
+          image: banderosik/banderachat-backend:v1.0.0
+          command: ["/bin/sh","-c"]
+          args: ["alembic upgrade head"]
+          env:
+          - name: DATABASE_HOST
+            value: "db"
+          - name: DATABASE_USERNAME
+            value: "root"
+          - name: DATABASE_PASSWORD
+            value: "admin"
+          - name: DATABASE
+            value: "db"
+          - name: DATABASE_SOCKET
+            value: "3306"
+      restartPolicy: Never
+  backoffLimit: 5

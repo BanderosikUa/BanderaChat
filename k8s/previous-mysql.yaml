@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-deploy
+  labels:
+    name: mysql-deploy
+    app: webregi-v2-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: mysql-pod
+      app: webregi-v2-app
+  template:
+    metadata:
+      name: mysql-pod
+      labels:
+        name: mysql-pod
+        app: webregi-v2-app
+    spec:
+      containers:
+      - name: mysql
+        image: mysql
+        ports:
+        - containerPort: 3306
+        env:
+          - name: MYSQL_ROOT_PASSWORD
+            value: admin
+          - name: MYSQL_DATABASE
+            value: db
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: db
+  labels:
+    name: mysql-service
+    app: webregi-v2-app
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 3306
+    targetPort: 3306
+  selector:
+    name: mysql-pod
+    app: webregi-v2-app
