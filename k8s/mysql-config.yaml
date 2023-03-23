@@ -5,13 +5,13 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: "mysql"
-  serviceName: "mysql-service"
-  replicas: 2
+      app: mysql
+  serviceName: "mysql"
+  replicas: 1
   template:
     metadata:
       labels:
-        app: "mysql"
+        app: mysql
     spec:
       terminationGracePeriodSeconds: 10
       containers:
@@ -57,9 +57,9 @@ metadata:
   labels:
     app: mysql
 spec:
-  type: LoadBalancer
   ports:
   - port: 3306
-    targetPort: 3306
+    name: mysql
+  type: NodePort
   selector:
     app: mysql

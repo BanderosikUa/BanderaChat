@@ -14,36 +14,46 @@ spec:
     spec:
       containers:
       - name: webregi-v2-app
-        image: banderosik/banderachat-backend:v1.0.0
+        image: banderosik/banderachat-backend:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8000
-          env:
+        env:
           - name: DATABASE_HOST
-            valueFrom:
-              secretKeyRef:
-                name: banderachat-secrets
-                key: DATABASE_HOST
+            value: mysql-service
           - name: DATABASE_USERNAME
-            valueFrom:
-              secretKeyRef:
-                name: banderachat-secrets
-                key: DATABASE_USERNAME
+            value: root
           - name: DATABASE_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: banderachat-secrets
-                key: DATABASE_PASSWORD
+            value: admin
           - name: DATABASE
-            valueFrom:
-              secretKeyRef:
-                name: banderachat-secrets
-                key: DATABASE
+            value: db
           - name: DATABASE_SOCKET
-            valueFrom:
-              secretKeyRef:
-                name: banderachat-secrets
-                key: DATABASE_SOCKET
+            value: "3306"
+        # - name: DATABASE_HOST
+        #   valueFrom:
+        #     secretKeyRef:
+        #       name: banderachat-secrets
+        #       key: DATABASE_HOST
+        # - name: DATABASE_USERNAME
+        #   valueFrom:
+        #     secretKeyRef:
+        #       name: banderachat-secrets
+        #       key: DATABASE_USERNAME
+        # - name: DATABASE_PASSWORD
+        #   valueFrom:
+        #     secretKeyRef:
+        #       name: banderachat-secrets
+        #       key: DATABASE_PASSWORD
+        # - name: DATABASE
+        #   valueFrom:
+        #     secretKeyRef:
+        #       name: banderachat-secrets
+        #       key: DATABASE
+        # - name: DATABASE_SOCKET
+        #   valueFrom:
+        #     secretKeyRef:
+        #       name: banderachat-secrets
+        #       key: DATABASE_SOCKET
 
 ---
 
@@ -52,7 +62,7 @@ kind: Service
 metadata:
   name: webregi-v2-service
 spec:
-  replicas: 1
+  # replicas: 1
   type: NodePort
   ports:
     - protocol: TCP

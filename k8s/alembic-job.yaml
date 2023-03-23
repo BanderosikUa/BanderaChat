@@ -12,13 +12,13 @@ spec:
           args: ["alembic upgrade head"]
           env:
           - name: DATABASE_HOST
-            value: "db"
+            value: mysql-service
           - name: DATABASE_USERNAME
-            value: "root"
+            value: root
           - name: DATABASE_PASSWORD
-            value: "admin"
+            value: admin
           - name: DATABASE
-            value: "db"
+            value: db
           - name: DATABASE_SOCKET
             value: "3306"
       restartPolicy: Never
