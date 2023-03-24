@@ -45,8 +45,8 @@ class TestAuthRouters:
         )
         resp_json = resp.json()
 
-        assert resp.status_code == status.HTTP_400_BAD_REQUEST
-        assert resp_json['detail'] == ErrorCode.EMAIL_TAKEN
+        assert resp.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        assert resp_json['detail'][0]['email'] == ErrorCode.EMAIL_TAKEN
         
     async def test_register_username_taken(self, client: TestClient, db: Session) -> None:
         user_1 = UserCreate(username='test1', email='test1@world.com',
@@ -63,8 +63,8 @@ class TestAuthRouters:
         )
         resp_json = resp.json()
 
-        assert resp.status_code == status.HTTP_400_BAD_REQUEST
-        assert resp_json['detail'] == ErrorCode.USERNAME_TAKEN
+        assert resp.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        assert resp_json['detail'][0]['username'] == ErrorCode.USERNAME_TAKEN
     
     async def test_register_passwords_not_matches(self, client: TestClient, db: Session) -> None:
         resp = await client.post(
@@ -78,5 +78,5 @@ class TestAuthRouters:
         )
         resp_json = resp.json()
 
-        assert resp.status_code == status.HTTP_400_BAD_REQUEST
-        assert resp_json['detail'] == ErrorCode.PASSWORD_NOT_MATCH
+        assert resp.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        assert resp_json['detail'][0]['passwordConfirm'] == ErrorCode.PASSWORD_NOT_MATCH

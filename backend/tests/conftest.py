@@ -11,8 +11,11 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
 
-from src.config import settings
+from src.config import settings, Environment
 from src.database import Base, get_db
+
+settings.ENVIRONMENT = Environment.TESTING
+
 
 SQLALCHEMY_DATABASE_URL = "mysql+pymysql://root:admin@mysql:3306/test"
 engine = create_engine(
@@ -24,14 +27,16 @@ TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engin
 Base.metadata.drop_all(bind=engine)
 Base.metadata.create_all(bind=engine)
 
-@pytest.fixture(autouse=True, scope="session")
+
+
+@pytest_asyncio.fixture(autouse=True, scope="session")
 def run_migrations() -> None:
     import os
 
     print("running migrations..")
     os.system("alembic upgrade head")
 
-@pytest.fixture(scope="function")
+@pytest_asyncio.fixture(scope="function")
 def db():
     Base.metadata.create_all(bind=engine)
     try:
@@ -40,7 +45,7 @@ def db():
         TestingSessionLocal().close_all()
         Base.metadata.drop_all(bind=engine)
         
-@pytest.fixture(scope="session")
+@pytest_asyncio.fixture(scope="session")
 def event_loop() -> Generator[asyncio.AbstractEventLoop, None, None]:
     loop = asyncio.get_event_loop_policy().new_event_loop()
     yield loop

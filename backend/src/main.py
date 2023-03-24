@@ -1,10 +1,20 @@
+import json
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.exceptions import RequestValidationError, ValidationError
+import fastapi.openapi.utils as fu
 
-from src.config import app_configs, settings
+from starlette.responses import JSONResponse
+
+from src.config import app_configs, settings, LOGGER
 from src.database import SessionLocal
+from src.exceptions import CustomValidationError
+from src.schemas import ErrorResponse
+
 from src.auth.routers import router as auth_router
 
+fu.validation_error_response_definition = ErrorResponse.schema()
 app = FastAPI(**app_configs)
 
 app.add_middleware(
@@ -19,6 +29,17 @@ app.add_middleware(
 @app.get("/")
 def home():
     return "Hello, Worldfasdsadff!"
+
+@app.exception_handler(RequestValidationError)
+@app.exception_handler(ValidationError)
+@app.exception_handler(CustomValidationError)
+async def validation_exception_handler(request, exc: RequestValidationError|CustomValidationError) -> ErrorResponse:
+    exc_json = json.loads(exc.json())
+    response = {"status": "error", "detail": []}
+    for error in exc_json:
+        response['detail'].append({error['loc'][-1]: error['msg']})
+
+    return JSONResponse(response, status_code=422)
 
 
 app.include_router(auth_router, prefix="/auth", tags=["Auth"])

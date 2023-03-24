@@ -5,12 +5,13 @@ from sqlalchemy.orm import Session
 
 from src.config import LOGGER
 from src.exceptions import DetailedBadRequest
+from src.database import get_db
 
 from src.auth import crud
 from src.auth import exceptions
-from src.auth.dependencies import (
-    get_db
-)
+# from src.auth.dependencies import (
+    # get_db
+# )
 from src.auth.schemas import (
     UserCreate, UserLogin, UserResponse,
     UserBase, UserRegister, AccessTokenResponse)
@@ -31,9 +32,6 @@ async def register_user(
     auth_data: UserRegister,
     db: Session = Depends(get_db)
 ) -> dict[str, str | dict]:
-    if auth_data.password != auth_data.passwordConfirm:
-        raise exceptions.PasswordNotMatch()
-    
     delattr(auth_data, "passwordConfirm")
     
     if await crud.get_user_by_email(db, auth_data.email):

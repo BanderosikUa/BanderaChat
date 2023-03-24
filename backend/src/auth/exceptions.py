@@ -1,4 +1,4 @@
-from src.exceptions import BadRequest, NotAuthenticated, PermissionDenied, HTTPException
+from src.exceptions import BadRequest, NotAuthenticated, PermissionDenied, CustomValidationError
 
 from src.auth.constants import ErrorCode
 
@@ -14,11 +14,13 @@ class InvalidToken(NotAuthenticated):
 class InvalidCredentials(NotAuthenticated):
     DETAIL = ErrorCode.INVALID_CREDENTIALS
 
-class EmailTaken(BadRequest):
-    DETAIL = ErrorCode.EMAIL_TAKEN
+class EmailTaken(CustomValidationError):
+    FIELD = "email"
+    MESSAGE = ErrorCode.EMAIL_TAKEN
     
-class UsernameTaken(BadRequest):
-    DETAIL = ErrorCode.USERNAME_TAKEN
+class UsernameTaken(CustomValidationError):
+    FIELD = "username"
+    MESSAGE = ErrorCode.USERNAME_TAKEN
 
 class PasswordNotMatch(BadRequest):
     DETAIL = ErrorCode.PASSWORD_NOT_MATCH

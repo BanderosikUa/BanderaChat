@@ -1,17 +1,26 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import ChatsView from '../views/ChatsView.vue'
 import HomeView from '@/views/HomeView'
+import LoginView from '@/views/LoginView'
 
 const routes = [
   {
-    path: '/',
+    path: '/home',
     name: 'home',
-    component: HomeView
+    component: HomeView,
   },
   {
-    path: '/Chats',
+    path: '/chats',
     name: 'chat',
     component: ChatsView
+  },
+  {
+    path: '/login',
+    name: 'login',
+    component: LoginView,
+    meta: {
+      hideNavbar: true,
+     }
   },
   {
     path: '/about',
@@ -26,6 +35,24 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
+})
+
+router.beforeEach(function(to, from, next){
+    var isAuthenticated = false;
+    //this is just an example. You will have to find a better or 
+    // centralised way to handle you localstorage data handling 
+    if(localStorage.getItem('access_token'))
+      isAuthenticated = true;
+    else
+      isAuthenticated= false;
+    if ( to.name !== 'login' && !isAuthenticated ){
+      next({
+        path: 'login',
+        replace: true
+      })
+    } else {
+      next();
+    }
 })
 
 export default router

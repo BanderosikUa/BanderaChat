@@ -1,6 +1,6 @@
 <template>
-  <NavbarItem></NavbarItem>
-  <div class="main container">
+  <NavbarItem v-if="!$route.meta.hideNavbar"></NavbarItem>
+  <div class="main">
     <router-view/>
   </div>
 </template>
@@ -10,15 +10,20 @@
   display: flex;
 }
 
-*{
-  box-sizing: border-box;
+.main{
+  width: 100%;
 }
 
+*{
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+/* 
 .main.container{
   padding: 30px;
   display: flex;
 
-}
+} */
 
 body{
   background: rgb(229, 229, 229);

@@ -3,7 +3,10 @@ from datetime import datetime
 
 from pydantic import EmailStr, Field, validator, constr, root_validator
 
+from src.config import LOGGER
 from src.models import ORJSONModel
+
+from src.auth.constants import ErrorCode
 
 STRONG_PASSWORD_PATTERN = re.compile(r"^(?=.*[\d])(?=.*[!@#$%^&*])[\w!@#$%^&*]{6,128}$")
 
@@ -35,6 +38,18 @@ class UserRegister(UserBase):
             )
 
         return password
+    
+    @validator("passwordConfirm")
+    def verify_password_match(cls, v, values, **kwargs):
+        password = values.get("password")
+        
+        if password and password != v:
+            raise ValueError(ErrorCode.PASSWORD_NOT_MATCH)
+        return values
+    
+    # @validator("email")
+    # def valid_email_duplicate(cls, email: EmailStr):
+        
         
 class UserLogin(ORJSONModel):
     email: EmailStr|None

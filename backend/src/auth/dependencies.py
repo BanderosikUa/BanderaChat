@@ -12,12 +12,5 @@ from src.auth import crud, exceptions
 from src.auth.models import RefreshToken
 
 
-def get_db():
-    try:
-        db = SessionLocal()
-        yield db
-    finally:
-        db.close()
-
 def _is_valid_refresh_token(db_refresh_token: RefreshToken) -> bool:
     return datetime.utcnow() <= db_refresh_token.expires_at

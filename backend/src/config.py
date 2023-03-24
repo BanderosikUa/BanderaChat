@@ -62,3 +62,6 @@ if settings.ENVIRONMENT.is_deployed:
 
 if not settings.ENVIRONMENT.is_debug:
     app_configs["openapi_url"] = None  # hide docs
+
+if settings.ENVIRONMENT.is_testing:
+    settings.DATABASE_URL = settings.DATABASE_TEST_URL  # hide docs

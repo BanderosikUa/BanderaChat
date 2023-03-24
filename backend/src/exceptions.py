@@ -1,6 +1,12 @@
+import json
+
 from typing import Any
 
 from fastapi import HTTPException, status
+from fastapi.exceptions import RequestValidationError
+
+from pydantic import BaseModel
+
 
 
 class DetailedHTTPException(HTTPException):
@@ -24,11 +30,20 @@ class BadRequest(DetailedHTTPException):
     STATUS_CODE = status.HTTP_400_BAD_REQUEST
     DETAIL = "Bad Request"
     
-class DetailedBadRequest(HTTPException):
+class DetailedBadRequest(RequestValidationError):
     STATUS_CODE = status.HTTP_400_BAD_REQUEST
     
     def __init__(self, detail, **kwargs: dict[str, Any]) -> None:
         super().__init__(status_code=self.STATUS_CODE, detail=detail, **kwargs)
+        
+class CustomValidationError(DetailedHTTPException):
+    STATUS_CODE = status.HTTP_422_UNPROCESSABLE_ENTITY
+    FIELD: str # field name
+    MESSAGE: str # error message
+     
+    def json(self) -> str:
+        return json.dumps([{'loc': (self.FIELD,), 'msg': self.MESSAGE}])
+
 
 class NotAuthenticated(DetailedHTTPException):
     STATUS_CODE = status.HTTP_401_UNAUTHORIZED

@@ -1,21 +1,25 @@
-FROM python:3.11-alpine3.16
+FROM python:3.11-alpine as base
+RUN apk add build-deps \
+    build-base \
+    python3-dev \
+    libpq \
+    gcc g++ \
+    cargo \
+    rm -rf /var/cache/apk/*
 
-RUN mkdir app
+COPY requirements.txt /app/requirements.txt
+RUN pip install -r /app/requirements.txt
+
+# Now multistage build
+FROM python:3.11-alpine
+
+RUN apk add --no-cache libpq libstdc++
+COPY --from=base /usr/local/lib/python3.11/site-packages/ /usr/local/lib/python3.11/site-packages/
+COPY --from=base /usr/local/bin/ /usr/local/bin/
+COPY . /app
+
 WORKDIR /app
 
-RUN apk update && \
-    apk add --virtual build-deps gcc python3-dev musl-dev && \
-    apk add postgresql-dev cargo
+ENV PYTHONUNBUFFERED 1
 
-ENV PATH="${PATH}:/root/.local/bin"
-ENV PYTHONPATH=.
-
-COPY requirements.txt .
-RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
-
-COPY . .
-
-# EXPOSE 80/tcp
-# ENTRYPOINT [ "alembic", "upgrade", "head"]
 CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]

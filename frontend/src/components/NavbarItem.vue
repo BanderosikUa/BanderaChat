@@ -8,11 +8,6 @@
             </div>
         </header>
         <ul class="menu-links">
-            <!-- <li class="nav-link">
-                <a href="Chats">
-                    <i class='bx bx-chat icon'></i>
-                </a>
-            </li> -->
             <li class="nav-link">
                 <router-link to="Chats">
                     <i class='bx bx-chat icon'></i>
@@ -39,7 +34,7 @@
                 </a>
             </li>
             <li class="nav-link">
-                <a href="#">
+                <a href="#" @click="logout">
                     <i class='bx bx-power-off icon'></i>
                 </a>
             </li>
@@ -117,3 +112,14 @@ body{
     margin-top: auto;
 }
 </style>
+
+<script>
+export default{
+    methods: {
+        logout(){
+            localStorage.removeItem("access_token");
+            this.$router.push('login')
+        }
+    }
+}
+</script>

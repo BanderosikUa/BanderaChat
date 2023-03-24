@@ -7,9 +7,10 @@ from fastapi import Depends, Cookie
 
 from sqlalchemy.orm import Session
 
+from src.database import get_db
+
 from src.auth.config import auth_config
 from src.auth import crud, exceptions
-from src.auth.dependencies import get_db
 
 class Settings(BaseModel):
     authjwt_algorithm: str = auth_config.JWT_ALGORITHM
