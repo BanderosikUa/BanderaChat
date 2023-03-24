@@ -244,11 +244,17 @@ export default{
                 password: this.password,
                 passwordConfirm: this.passwordConfirm,
             }
-            const response = await axios.post('auth/register', data)
-            console.log(response)
-            if (response.data.status == "success"){
-                const wrapper = document.querySelector('.wrapper')
-                wrapper.classList.remove('active')
+            try{
+                const response = await axios.post('auth/register', data)
+                console.log(response)
+                if (response.data.status == "success"){
+                    const wrapper = document.querySelector('.wrapper')
+                    wrapper.classList.remove('active')
+                }
+            }
+            catch(e){
+                console.log(e)
+                alert(JSON.stringify(e.response.data.detail, null, 2))
             }
              
         },
@@ -257,12 +263,16 @@ export default{
                 email: this.email,
                 password: this.password,
             }
-            const response = await axios.post('auth/login', data)
-            console.log(response)
-            if (response.data.status == "success"){
-                localStorage.setItem('access_token', response.data.access_token)
-                this.$router.push('home')
+            try{
+                const response = await axios.post('auth/login', data)
+                console.log(response)
+                if (response.data.status == "success"){
+                    localStorage.setItem('access_token', response.data.access_token)
+                    this.$router.push('home')
 
+                }
+            } catch(e){
+                alert(JSON.stringify(e.response.data.detail, null, 2))
             }
              
         }

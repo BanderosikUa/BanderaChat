@@ -17,6 +17,7 @@ from src.auth.schemas import (
     UserBase, UserRegister, AccessTokenResponse)
 from src.auth.serializers import userResponseEntity
 from src.auth.oa2auth import AuthJWT, required_user
+from src.auth.security import check_password
 
 from .config import auth_config
 
@@ -66,6 +67,9 @@ async def login(payload: UserLogin, response: Response,
         user = await crud.get_user_by_username(db, payload.username)
     
     if not user:
+        raise exceptions.InvalidCredentials()
+    
+    if not check_password(payload.password, user.password):
         raise exceptions.InvalidCredentials()
     
     # Create access token

@@ -114,11 +114,20 @@ body{
 </style>
 
 <script>
+import axios from 'axios'
+
 export default{
     methods: {
-        logout(){
-            localStorage.removeItem("access_token");
-            this.$router.push('login')
+        async logout(){
+            try{
+                const response = await axios.get('auth/logout')
+                console.log(response.data)
+                if (response.data.status == "success"){
+                    localStorage.removeItem("access_token");
+                    this.$router.push('login')}
+            } catch(e){
+                console.log(e)
+            }
         }
     }
 }
