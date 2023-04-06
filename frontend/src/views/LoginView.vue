@@ -268,7 +268,8 @@ export default{
                 console.log(response)
                 if (response.data.status == "success"){
                     localStorage.setItem('access_token', response.data.access_token)
-                    this.$router.push('home')
+                    axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('access_token');
+                    this.$router.push('/home')
 
                 }
             } catch(e){

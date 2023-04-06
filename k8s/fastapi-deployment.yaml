@@ -54,7 +54,14 @@ spec:
         #     secretKeyRef:
         #       name: banderachat-secrets
         #       key: DATABASE_SOCKET
-
+        resources:
+            limits:
+              cpu: 256m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+---
 ---
 
 apiVersion: v1

@@ -33,6 +33,14 @@ spec:
               secretKeyRef:
                 name: banderachat-secrets
                 key: DATABASE
+        resources:
+          limits:
+            cpu: 512m
+            memory: 1028Mi
+          requests:
+            cpu: 256m
+            memory: 512Mi
+---
   # updateStrategy:
   #   rollingUpdate:
   #     partition: 0

@@ -3,7 +3,9 @@
         <header>
             <div class="image-text">
                 <span class="image">
-                    <img src="../assets/logo.png">
+                    <!-- <router-link to="home"> -->
+                        <img src="../assets/logo.png">
+                    <!-- </router-link> -->
                 </span>
             </div>
         </header>
@@ -127,6 +129,7 @@ export default{
                     this.$router.push('login')}
             } catch(e){
                 console.log(e)
+                if (e.response.status == 401){this.$router.push('login')}
             }
         }
     }
