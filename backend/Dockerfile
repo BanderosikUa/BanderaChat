@@ -3,9 +3,13 @@ FROM python:3.11-alpine3.16
 RUN mkdir app
 WORKDIR /app
 
-RUN apk update && \
-    apk add --virtual build-deps gcc python3-dev musl-dev && \
-    apk add postgresql-dev cargo
+RUN apk add build-deps \
+    python3-dev \
+    libpq \
+    gcc g++ \
+    cargo \
+    && rm -rf /var/cache/apk/*
+
 
 ENV PATH="${PATH}:/root/.local/bin"
 ENV PYTHONPATH=.

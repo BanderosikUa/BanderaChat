@@ -7,11 +7,7 @@ from src.config import LOGGER
 from src.exceptions import DetailedBadRequest
 from src.database import get_db
 
-from src.auth import crud
-from src.auth import exceptions
-# from src.auth.dependencies import (
-    # get_db
-# )
+from src.auth import crud, exceptions
 from src.auth.schemas import (
     UserCreate, UserLogin, UserResponse,
     UserBase, UserRegister, AccessTokenResponse)

@@ -1,10 +1,9 @@
 FROM python:3.11-alpine as base
 RUN apk add build-deps \
-    build-base \
     python3-dev \
     libpq \
     gcc g++ \
-    cargo \
+    cargo && \
     rm -rf /var/cache/apk/*
 
 COPY requirements.txt /app/requirements.txt

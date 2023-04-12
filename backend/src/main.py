@@ -13,6 +13,7 @@ from src.exceptions import CustomValidationError
 from src.schemas import ErrorResponse
 
 from src.auth.routers import router as auth_router
+from src.chat.routers import router as chat_router
 
 fu.validation_error_response_definition = ErrorResponse.schema()
 app = FastAPI(**app_configs)
@@ -43,3 +44,4 @@ async def validation_exception_handler(request, exc: RequestValidationError|Cust
 
 
 app.include_router(auth_router, prefix="/auth", tags=["Auth"])
+app.include_router(chat_router, prefix="/chat", tags=["Chat"])
