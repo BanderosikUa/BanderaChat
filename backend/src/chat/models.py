@@ -29,8 +29,9 @@ class Chat(Base):
     
     photo = Column(String(55), default="", nullable=False)
     
-    creator = relationship("User", back_populates="creators")
-    moderators = relationship("User", back_populates="moderators")
+    creator = relationship("User", back_populates="chat_creator")
+    moderators = relationship("User", back_populates="chat_moderator")
+    participants = relationship("User", back_populates="chat_participant")
     
     created_at = Column(DateTime, default=datetime.datetime.now, nullable=False)
     updated_at = Column(DateTime, onupdate=datetime.datetime.now, 

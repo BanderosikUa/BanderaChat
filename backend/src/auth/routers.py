@@ -13,7 +13,7 @@ from src.auth.schemas import (
     UserBase, UserRegister, AccessTokenResponse)
 from src.auth.serializers import userResponseEntity
 from src.auth.oa2auth import AuthJWT, required_user
-from src.auth.security import check_password
+from src.auth.services import authenticate_user
 
 from .config import auth_config
 
@@ -47,7 +47,7 @@ async def register_user(
 
 @router.get('/me', response_model=UserResponse)
 async def get_me(user_id: str = Depends(required_user),
-           db: Session = Depends(get_db)):
+                 db: Session = Depends(get_db)):
     user = await crud.get_user_by_id(db, user_id)
     user = userResponseEntity(user)
     return {"status": "success", "user": user}
@@ -57,16 +57,7 @@ async def get_me(user_id: str = Depends(required_user),
 async def login(payload: UserLogin, response: Response,
                 Authorize: AuthJWT = Depends(),
                 db: Session = Depends(get_db)) -> AccessTokenResponse:
-    if payload.email:
-        user = await crud.get_user_by_email(db, payload.email)
-    else:
-        user = await crud.get_user_by_username(db, payload.username)
-    
-    if not user:
-        raise exceptions.InvalidCredentials()
-    
-    if not check_password(payload.password, user.password):
-        raise exceptions.InvalidCredentials()
+    user = authenticate_user(db, payload)
     
     # Create access token
     access_token = Authorize.create_access_token(

@@ -79,8 +79,14 @@ async def expire_refresh_token(db: Session, refresh_token_uuid: UUID4) -> None:
     db.refresh(db_refresh_token)
 
 
-async def authenticate_user(auth_data: UserCreate) -> User:
+async def authenticate_user(db: Session, auth_data: UserCreate) -> User:
     user = await get_user_by_username(auth_data.username)
+    if auth_data.email:
+        user = await get_user_by_email(db, auth_data.email)
+    else:
+        user = await get_user_by_username(db, auth_data.username)
+    
+    
     if not user:
         raise InvalidCredentials()
 
