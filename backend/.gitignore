@@ -136,6 +136,7 @@ dmypy.json
 staticfiles/
 logs
 **/migrations/**
+alembic/versions/**
 !**/migrations/__init__.py
 __pycache__
 

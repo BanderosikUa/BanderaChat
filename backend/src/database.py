@@ -1,18 +1,7 @@
 import uuid
 
 from sqlalchemy import (
-    Boolean,
-    Column,
-    DateTime,
-    ForeignKey,
-    Identity,
-    Integer,
-    LargeBinary,
-    MetaData,
-    String,
-    Table,
     create_engine,
-    func,
 )
 from sqlalchemy.dialects.mysql import BINARY
 from sqlalchemy.types import TypeDecorator
@@ -25,9 +14,6 @@ from src.constants import DB_NAMING_CONVENTION
 DATABASE_URL = settings.DATABASE_URL
 
 engine = create_engine(DATABASE_URL)
-# metadata = MetaData(naming_convention=DB_NAMING_CONVENTION)
-
-# database = Database(DATABASE_URL, force_rollback=settings.ENVIRONMENT.is_testing)
 
 SessionLocal = sessionmaker(
     autocommit=False,
@@ -43,17 +29,6 @@ def get_db():
         yield db
     finally:
         db.close()
-
-# class DbContext:
-#     def __init__(self):
-#         self.db = SessionLocal()
-
-#     def __enter__(self):
-#         return self.db
-
-#     def __exit__(self, et, ev, traceback):
-#         self.db.close()
-
 
 class BinaryUUID(TypeDecorator):
     '''Optimize UUID keys. Store as 16 bit binary, retrieve as uuid.

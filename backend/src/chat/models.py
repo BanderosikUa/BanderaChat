@@ -9,7 +9,7 @@ class Message(Base):
     __tablename__ = 'message'
     
     id = Column(Integer, primary_key=True, index=True, nullable=False)
-    message = Column(String, nullable=False)
+    message = Column(String(1000), nullable=False)
     is_read = Column(Boolean, default=False, nullable=False)
     
     created_at = Column(DateTime, default=datetime.datetime.now, nullable=False)
