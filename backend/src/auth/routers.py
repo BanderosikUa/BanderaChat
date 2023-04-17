@@ -12,8 +12,9 @@ from src.auth.schemas import (
     UserCreate, UserLogin, UserResponse,
     UserBase, UserRegister, AccessTokenResponse)
 from src.auth.serializers import userResponseEntity
-from src.auth.oa2auth import AuthJWT, required_user
+from src.auth.oa2auth import AuthJWT
 from src.auth.services import authenticate_user
+from src.auth.dependencies import required_user
 
 from .config import auth_config
 

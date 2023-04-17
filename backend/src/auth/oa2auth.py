@@ -28,28 +28,3 @@ class Settings(BaseModel):
 @AuthJWT.load_config
 def get_config():
     return Settings()
-
-def required_user(Authorize: AuthJWT = Depends(), db : Session = Depends(get_db)):
-    try:
-        Authorize.jwt_required()
-        user_id = Authorize.get_jwt_subject()
-        user = crud.get_user_by_id(db, user_id)
-
-        if not user:
-            raise exceptions.AuthRequired()
-
-        # if not user["verified"]:
-        #     raise NotVerified('You are not verified')
-
-    except Exception as e:
-        error = e.__class__.__name__
-        # LOGGER.error(error)
-        if error == 'MissingTokenError':
-            raise exceptions.AuthRequired()
-        if error == 'UserNotFound':
-            raise exceptions.UserNotExistsWithRefreshToken()
-        # if error == 'NotVerified':
-        #     raise HTTPException(
-        #         status_code=status.HTTP_401_UNAUTHORIZED, detail='Please verify your account')
-        raise exceptions.InvalidToken()
-    return user_id

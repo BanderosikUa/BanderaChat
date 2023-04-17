@@ -11,6 +11,8 @@ class ConnectionManager:
     def disconnect(self, websocket: WebSocket):
         self.active_connections.remove(websocket)
 
+    #  todo: mark read message here!! 
+
     async def send_personal_message(self, message: str, websocket: WebSocket):
         await websocket.send_text(message)
 

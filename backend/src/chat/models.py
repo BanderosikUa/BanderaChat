@@ -10,7 +10,8 @@ class Message(Base):
     
     id = Column(Integer, primary_key=True, index=True, nullable=False)
     message = Column(String(1000), nullable=False)
-    is_read = Column(Boolean, default=False, nullable=False)
+    # is_read = Column(Boolean, default=False, nullable=False)
+    read_by = relationship("User", back_populates="read_messages")
     
     created_at = Column(DateTime, default=datetime.datetime.now, nullable=False)
     updated_at = Column(DateTime, onupdate=datetime.datetime.now, 
