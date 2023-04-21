@@ -1,30 +1,30 @@
 import re
 from datetime import datetime
+from typing import Optional
 
 from pydantic import EmailStr, Field, validator, constr, root_validator
 
 from src.config import LOGGER
 from src.models import ORJSONModel
+from src.schemas import AllOptional
 
 from src.auth.constants import ErrorCode
 
 STRONG_PASSWORD_PATTERN = re.compile(r"^(?=.*[\d])(?=.*[!@#$%^&*])[\w!@#$%^&*]{6,128}$")
 
 class UserBase(ORJSONModel):
-    username: str = Field(max_length=128, min_length=3)
-    email: EmailStr
-    photo: str = ""
-    created_at: datetime | None = None
-    updated_at: datetime | None = None
-    verified: bool = False
-
-class UserCreate(UserBase):
-    password: constr(min_length=8)
+    username: Optional[str]
+    email: Optional[EmailStr]
+    photo: Optional[str] = ""
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+    verified: Optional[bool] = False
 
 class UserRegister(UserBase):
+    username: str = Field(max_length=128, min_length=3)
+    email: EmailStr
     password: constr(min_length=8)
     passwordConfirm: str
-    verified: bool = False
     
     @validator("password")
     def valid_password(cls, password: str) -> str:
@@ -47,13 +47,10 @@ class UserRegister(UserBase):
             raise ValueError(ErrorCode.PASSWORD_NOT_MATCH)
         return values
     
-    # @validator("email")
-    # def valid_email_duplicate(cls, email: EmailStr):
-        
-        
+    
 class UserLogin(ORJSONModel):
-    email: EmailStr|None
-    username: str|None = Field(max_length=128, min_length=3)
+    email: Optional[EmailStr]
+    username: Optional[str] = Field(max_length=128, min_length=3)
     password: constr(min_length=8)
     
     class Config:
@@ -65,37 +62,21 @@ class UserLogin(ORJSONModel):
             raise ValueError('Either email or username must be set.')
         return values
     
+class User(UserBase):
+    id: int
+    is_admin: bool
+    
+    class Config:
+        orm_mode = True
+
 class UserResponseSchema(UserBase):
     id: int
-    pass
 
 class UserResponse(ORJSONModel):
     status: str
     user: UserResponseSchema
     
         
-# class UserCreate(UserBase):
-#     @validator("password")
-#     def valid_password(cls, password: str) -> str:
-#         if not re.match(STRONG_PASSWORD_PATTERN, password):
-#             raise ValueError(
-#                 "Password must contain at least "
-#                 "one lower character, "
-#                 "one upper character, "
-#                 "digit or "
-#                 "special symbol"
-#             )
-
-#         return password
-    
-# class UserResponse(UserBase):
-#     pass
-
-# class JWTData(ORJSONModel):
-#     user_id: int = Field(alias="sub")
-#     is_admin: bool = False
-
-
 class AccessTokenResponse(ORJSONModel):
     status: str
     access_token: str

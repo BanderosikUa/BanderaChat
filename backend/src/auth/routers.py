@@ -9,7 +9,7 @@ from src.database import get_db
 
 from src.auth import crud, exceptions
 from src.auth.schemas import (
-    UserCreate, UserLogin, UserResponse,
+    User, UserLogin, UserResponse,
     UserBase, UserRegister, AccessTokenResponse)
 from src.auth.serializers import userResponseEntity
 from src.auth.oa2auth import AuthJWT
@@ -45,34 +45,34 @@ async def register_user(
         "user": user_entity,
     }
 
-
 @router.get('/me', response_model=UserResponse)
-async def get_me(user_id: str = Depends(required_user),
-                 db: Session = Depends(get_db)):
-    user = await crud.get_user_by_id(db, user_id)
+async def get_me(user: User = Depends(required_user)):
+    LOGGER.info(user.dict())
     user = userResponseEntity(user)
     return {"status": "success", "user": user}
-
 
 @router.post("/login", response_model=AccessTokenResponse)
 async def login(payload: UserLogin, response: Response,
                 Authorize: AuthJWT = Depends(),
                 db: Session = Depends(get_db)) -> AccessTokenResponse:
-    user = authenticate_user(db, payload)
+    user = await authenticate_user(db, payload)
     
     # Create access token
     access_token = Authorize.create_access_token(
-        subject=str(user.id), expires_time=timedelta(minutes=ACCESS_TOKEN_EXPIRES_IN))
+        subject=str(user.id), fresh=True, 
+        expires_time=timedelta(minutes=ACCESS_TOKEN_EXPIRES_IN))
 
     # Create refresh token
     refresh_token = Authorize.create_refresh_token(
         subject=str(user.id), expires_time=timedelta(minutes=REFRESH_TOKEN_EXPIRES_IN))
 
     # Store refresh and access tokens in cookie
-    response.set_cookie('access_token', access_token, ACCESS_TOKEN_EXPIRES_IN * 60,
-                        ACCESS_TOKEN_EXPIRES_IN * 60, '/', None, False, True, 'lax')
-    response.set_cookie('refresh_token', refresh_token,
-                        REFRESH_TOKEN_EXPIRES_IN * 60, REFRESH_TOKEN_EXPIRES_IN * 60, '/', None, False, True, 'lax')
+    Authorize.set_access_cookies(access_token)
+    Authorize.set_refresh_cookies(refresh_token)
+    # response.set_cookie('access_token', access_token, ACCESS_TOKEN_EXPIRES_IN * 60,
+    #                     ACCESS_TOKEN_EXPIRES_IN * 60, '/', None, False, True, 'lax')
+    # response.set_cookie('refresh_token', refresh_token,
+    #                     REFRESH_TOKEN_EXPIRES_IN * 60, REFRESH_TOKEN_EXPIRES_IN * 60, '/', None, False, True, 'lax')
     response.set_cookie('logged_in', 'True', ACCESS_TOKEN_EXPIRES_IN * 60,
                         ACCESS_TOKEN_EXPIRES_IN * 60, '/', None, False, False, 'lax')
 
@@ -83,7 +83,7 @@ async def login(payload: UserLogin, response: Response,
 
 @router.get('/refresh')
 async def refresh_token(response: Response, Authorize: AuthJWT = Depends(),
-                  db: Session = Depends(get_db)):
+                        db: Session = Depends(get_db)):
     try:
         Authorize.jwt_refresh_token_required()
 
@@ -101,16 +101,16 @@ async def refresh_token(response: Response, Authorize: AuthJWT = Depends(),
             raise exceptions.RefreshTokenRequired()
         raise DetailedBadRequest(detail=error)
 
-    response.set_cookie('access_token', access_token, ACCESS_TOKEN_EXPIRES_IN * 60,
-                        ACCESS_TOKEN_EXPIRES_IN * 60, '/', None, False, True, 'lax')
+    # Set the JWT cookies in the response
+    Authorize.set_access_cookies(access_token)
     response.set_cookie('logged_in', 'True', ACCESS_TOKEN_EXPIRES_IN * 60,
                         ACCESS_TOKEN_EXPIRES_IN * 60, '/', None, False, False, 'lax')
-    return {'access_token': access_token}
+    return {'status': True, 'access_token': access_token}
 
 
 @router.get('/logout', status_code=status.HTTP_200_OK)
 def logout(response: Response, Authorize: AuthJWT = Depends(), 
-           user_id: str = Depends(required_user)):
+           user: User = Depends(required_user)):
     Authorize.unset_jwt_cookies()
     response.set_cookie('logged_in', '', -1)
 

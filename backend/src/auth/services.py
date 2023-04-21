@@ -9,7 +9,7 @@ from src.auth.crud import get_user_by_username, get_user_by_email
 
 
 async def authenticate_user(db: Session, auth_data: UserLogin) -> User:
-    user = await get_user_by_username(auth_data.username)
+    user = await get_user_by_username(db, auth_data.username)
     if auth_data.email:
         user = await get_user_by_email(db, auth_data.email)
     else:

@@ -6,6 +6,9 @@ from sqlalchemy.orm import relationship
 
 from src.database import Base, BinaryUUID
 
+from src.chat.models import chat_participants, chat_moderators, users_read_messages
+
+
 class User(Base):
     __tablename__ = 'user'
 
@@ -21,6 +24,18 @@ class User(Base):
                         default=datetime.datetime.now, nullable=False)
     
     tokens = relationship("RefreshToken")
+    
+    # many to one
+    chats_creator = relationship("Chat", back_populates="creator")
+    messages = relationship("Message", back_populates="user")
+    
+    # many to many
+    chats_moderator = relationship("Chat", secondary=chat_moderators,
+                                   back_populates="moderators")
+    chats_participant = relationship("Chat", secondary=chat_participants,
+                                     back_populates="participants")
+    read_messages = relationship("Message", secondary=users_read_messages,
+                                 back_populates="read_by")
 
 
 class RefreshToken(Base):

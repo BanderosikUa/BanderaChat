@@ -13,12 +13,10 @@ from src.auth.config import auth_config
 from src.auth import crud, exceptions
 
 class Settings(BaseModel):
-    authjwt_algorithm: str = auth_config.JWT_ALGORITHM
-    authjwt_decode_algorithms: List[str] = [auth_config.JWT_ALGORITHM]
     authjwt_token_location: set = {'cookies', 'headers'}
     authjwt_access_cookie_key: str = 'access_token'
     authjwt_refresh_cookie_key: str = 'refresh_token'
-    authjwt_cookie_csrf_protect: bool = False
+    authjwt_secret_key: str = "secret"
     authjwt_public_key: str = base64.b64decode(
         auth_config.JWT_PUBLIC_KEY).decode('utf-8')
     authjwt_private_key: str = base64.b64decode(

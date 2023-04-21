@@ -10,10 +10,10 @@ from src.config import LOGGER
 from src.auth.models import User, RefreshToken
 from src.auth.config import auth_config
 from src.auth.exceptions import InvalidCredentials
-from src.auth.schemas import UserCreate
+from src.auth.schemas import UserRegister, UserLogin
 from src.auth.security import check_password, hash_password
 
-async def create_user(db: Session, user: UserCreate) -> User | None:
+async def create_user(db: Session, user: UserRegister) -> User | None:
     hashed_pasword = hash_password(user.password)
     
     user.password = hashed_pasword
@@ -33,6 +33,11 @@ async def get_user_by_id(db: Session, user_id: int) -> User | None:
 
     return select_query.one_or_none()
 
+
+async def get_users_list_by_ids(db: Session, user_ids: list[int]) -> list[User]:
+    select_query = db.query(User).filter(User.id.in_(user_ids))
+
+    return select_query.all()
 
 async def get_user_by_email(db: Session, email: str) -> User | None:
     select_query = db.query(User).filter(User.email == email)
@@ -79,7 +84,7 @@ async def expire_refresh_token(db: Session, refresh_token_uuid: UUID4) -> None:
     db.refresh(db_refresh_token)
 
 
-async def authenticate_user(db: Session, auth_data: UserCreate) -> User:
+async def authenticate_user(db: Session, auth_data: UserLogin) -> User:
     user = await get_user_by_username(auth_data.username)
     if auth_data.email:
         user = await get_user_by_email(db, auth_data.email)
