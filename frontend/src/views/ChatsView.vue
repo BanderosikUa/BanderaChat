@@ -1,48 +1,76 @@
 <template>
   <div class="sidebar-group chats container">
-    <div class="row">
-      <div class="sidebar active col-3">
-        <header>
-          <span>Chats</span>
-          <ul class="list-inline">
-            <li class="list-inline-item">
-              <div>
-                <button class="btn btn-light" id="Tooltip-Add-Group">
-                  <i class='bx bxs-group'></i>
-                </button>
-              </div>
-            </li>
-            <li class="list-inline-item"><button class="btn btn-light" id="Tooltip-New-Chat"><i
-                  class="bx bxs-chat"></i></button></li>
-          </ul>
-        </header>
-        <form></form>
-        <div class="sidebar-body "></div>
-      </div>
+    <div class="row sidebar-row">
+      <ChatSidebar @id-selected="selectedId = $event"></ChatSidebar>
+      <ChatItem v-if="selectedId" :id="selectedId"></ChatItem>
     </div>
   </div>
 </template>
 
-<style scoped>
-.sidebar {
-  background: #fff;
-  border-radius: 5px;
-  margin-right: 30px;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
+<script>
+// import axios from 'axios'
+// import PerfectScrollbar from 'vue3-perfect-scrollbar'
+import ChatSidebar from '@/components/ChatSidebar.vue'
+import ChatItem from '@/components/ChatItem.vue';
+
+export default {
+  components: {
+    ChatSidebar,
+    ChatItem
+  },
+  data() {
+    return {
+      selectedId: null
+    }
+  },
+  mounted() {
+    // Retrieve the selected ID from local storage and set it as the selectedId
+    const selectedId = localStorage.getItem('selectedId');
+    if (selectedId) {
+      this.selectedId = parseInt(selectedId);
+    }
+  },
+  watch: {
+    // Watch the selectedId property and store it in local storage when it changes
+    selectedId(newId) {
+      localStorage.setItem('selectedId', newId.toString());
+    }
+  }
+}
+</script>
+
+<style>
+
+
+.container{
+    margin-left: 20px;
 }
 
-.sidebar>header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 80px;
-  font-weight: 700;
-  border-radius: 0;
-  font-size: larger;
+.sidebar-row {
+  padding-top: 20px;
 }
-.sidebar>header ul{
-  margin-top: revert;
+
+figure.avatar>img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
+
+.rounded-circle {
+    border-radius: 50% !important;
+}
+
+img {
+    vertical-align: middle;
+}
+
+figure.avatar {
+    display: inline-block;
+    margin-bottom: 0;
+    height: 2.5rem;
+    width: 2.5rem;
+    border-radius: 50%;
+    margin-right: 1rem;
+}
+
 </style>

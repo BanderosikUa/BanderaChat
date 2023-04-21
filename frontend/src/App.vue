@@ -35,7 +35,7 @@ import NavbarItem from '@/components/NavbarItem.vue'
 
 export default {
   components: {
-    NavbarItem
-  }
+    NavbarItem,
+  },
 }
 </script>
