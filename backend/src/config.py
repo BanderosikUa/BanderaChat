@@ -5,6 +5,7 @@ from typing import Any
 from pydantic import BaseSettings, root_validator
 from pydantic.networks import MultiHostDsn
 from loguru import logger as LOGGER
+from google.cloud import storage
 
 from src.constants import Environment
 
@@ -12,9 +13,13 @@ BASE_DIR = Path(__file__).resolve().parent
 
 LOGGER.add(f'{BASE_DIR.parent}/logs/info.log', level='INFO', rotation="10 MB")
 
+client = storage.Client.from_service_account_json(BASE_DIR.joinpath("env/banderachat-4e4e89c6eafe.json"))
+bucket = client.get_bucket('banderachat-images')
+
+
 class Config(BaseSettings):
     class Config:
-        env_file = ".env"
+        env_file = "env/.env"
         env_file_encoding = "utf-8"
         env_prefix = "APP_"
         

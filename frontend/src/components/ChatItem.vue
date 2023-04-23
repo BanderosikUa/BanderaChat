@@ -58,6 +58,9 @@
 </template>
 
 <script>
+import io from 'socket.io-client'
+
+
 export default {
   props: {
     id: {
@@ -80,6 +83,18 @@ export default {
       ],
       newMessage: '',
     }
+  },
+  mounted() {
+    this.socket = io(`chats/${this.id}/ws`)
+
+    this.socket.on('connect', () => {
+      console.log('Connected to server')
+    })
+
+    this.socket.on('message', (data) => {
+      console.log('Received message:', data)
+      this.addMessage(data)
+    })
   },
   methods: {
     async sendMessage() {

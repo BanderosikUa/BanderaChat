@@ -3,7 +3,7 @@ from fastapi import APIRouter, BackgroundTasks, Depends, Response, status
 
 from sqlalchemy.orm import Session
 
-from src.config import LOGGER
+from src.config import LOGGER, bucket
 from src.exceptions import DetailedBadRequest
 from src.database import get_db
 
@@ -49,6 +49,7 @@ async def register_user(
 async def get_me(user: User = Depends(required_user)):
     LOGGER.info(user.dict())
     user = userResponseEntity(user)
+    
     return {"status": "success", "user": user}
 
 @router.post("/login", response_model=AccessTokenResponse)

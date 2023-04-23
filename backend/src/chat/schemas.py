@@ -25,6 +25,7 @@ class Message(MessageBase):
 class ChatBase(BaseModel):
     title: str
     participants: List[User] = []
+    is_direct: bool = False
     created_at: Optional[datetime]
     updated_at: Optional[datetime]
     
@@ -44,6 +45,7 @@ class Chat(ChatBase, metaclass=AllOptional):
 class ChatResponse(BaseModel):
     status: bool
     chat: Chat
+    
 
 class ChatListResponse(BaseModel):
     status: bool

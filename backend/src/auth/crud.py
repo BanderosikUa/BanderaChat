@@ -1,11 +1,12 @@
 import uuid
+import random
 from datetime import datetime, timedelta
 from pydantic import UUID4
 
 from sqlalchemy.orm import Session
 
 from src import utils
-from src.config import LOGGER
+from src.config import LOGGER, bucket
 
 from src.auth.models import User, RefreshToken
 from src.auth.config import auth_config
@@ -18,6 +19,16 @@ async def create_user(db: Session, user: UserRegister) -> User | None:
     
     user.password = hashed_pasword
     
+    if not user.photo:
+        try:
+            default_name = random.choice(
+                ["default.png", "default1.png", 
+                 "default2.png", "default3.png"])
+            photo_url = bucket.blob(default_name).public_url
+            user.photo = photo_url
+        except Exception as e:
+            LOGGER.error(e)
+        
     user = user.dict()
     
     db_user = User(**user)

@@ -7,3 +7,6 @@ class ChatPermissionRequired(BadRequest):
 
 class ChatNotFound(NotFound):
     DETAIL = ErrorCode.CHAT_NOT_FOUND
+
+class DirectChatAlreadyExists(BadRequest):
+    DETAIL = ErrorCode.ChatAlreadyExists

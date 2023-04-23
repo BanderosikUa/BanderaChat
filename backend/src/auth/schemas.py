@@ -64,7 +64,6 @@ class UserLogin(ORJSONModel):
     
 class User(UserBase):
     id: int
-    is_admin: bool
     
     class Config:
         orm_mode = True

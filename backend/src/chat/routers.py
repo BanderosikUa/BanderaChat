@@ -14,7 +14,7 @@ from src.config import LOGGER
 
 from src.chat.manager import manager
 # from src.chat. import Chat
-from src.chat import crud, schemas
+from src.chat import crud, schemas, services
 from src.chat.dependencies import valid_chat
 
 router = APIRouter()
@@ -63,5 +63,5 @@ async def get_users_chats(pagination: PaginationParams = Depends(),
                           user: User = Depends(required_user),
                           db: Session = Depends(get_db)) -> schemas.ChatListResponse:
     chats = await crud.get_chats(db, pagination, user)
-    LOGGER.info(chats)
+    chats = services.setup_default_chat_photo(user, chats)
     return {"status": True, "chats": chats}

@@ -1,6 +1,8 @@
 import os
 from pydantic import BaseSettings
 
+from src.config import BASE_DIR
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -19,7 +21,7 @@ class AuthConfig(BaseSettings):
     # SECURE_COOKIES: bool = True
     
     class Config:
-        env_file = './.env'
+        env_file = BASE_DIR.joinpath("env/.env")
 
 
 auth_config = AuthConfig()

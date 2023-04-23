@@ -36,7 +36,7 @@ async def required_user(Authorize: AuthJWT = Depends(),
 
     except Exception as e:
         error = e.__class__.__name__
-        # LOGGER.error(error)
+        LOGGER.error(error)
         if error == 'MissingTokenError':
             raise exceptions.AuthRequired()
         if error == 'UserNotFound':
