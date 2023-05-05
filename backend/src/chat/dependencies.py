@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from src.database import get_db
 from src.config import LOGGER
 
-from src.auth.dependencies import required_user
+from src.auth.dependencies import websocket_required_user
 from src.auth.schemas import User
 from src.auth.crud import get_user_by_id
 
@@ -14,7 +14,7 @@ from src.chat.schemas import Chat
 from src.chat.exceptions import ChatPermissionRequired, ChatNotFound
 
 async def valid_chat(chat_id: int, 
-                     user: User = Depends(required_user),
+                     user: User = Depends(websocket_required_user),
                      db: Session = Depends(get_db)) -> Chat:
     chat = await get_chat_by_id(db, chat_id)
     if not chat:
@@ -25,6 +25,3 @@ async def valid_chat(chat_id: int,
         raise ChatPermissionRequired()
     
     return chat
-
-async def websocket_required_user():
-    pass

@@ -20,14 +20,10 @@ async def create_user(db: Session, user: UserRegister) -> User | None:
     user.password = hashed_pasword
     
     if not user.photo:
-        try:
-            default_name = random.choice(
-                ["default.png", "default1.png", 
-                 "default2.png", "default3.png"])
-            photo_url = bucket.blob(default_name).public_url
-            user.photo = photo_url
-        except Exception as e:
-            LOGGER.error(e)
+        user = random.choice(
+            ["default.png", "default1.png", 
+             "default2.png", "default3.png"]
+            )
         
     user = user.dict()
     

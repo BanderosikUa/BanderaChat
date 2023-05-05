@@ -27,7 +27,7 @@ async def websocket_access(chat: schemas.Chat = Depends(valid_chat),
 
 @router.websocket("/chats/{chat_id}/ws")
 async def websocket_endpoint(websocket: WebSocket,
-                            #  chat: schemas.Chat = Depends(valid_chat),
+                             chat: schemas.Chat = Depends(valid_chat),
                              user: User = Depends(websocket_required_user),
                              db: Session = Depends(get_db)):
     # await manager.connect(websocket)
@@ -63,5 +63,5 @@ async def get_users_chats(pagination: PaginationParams = Depends(),
                           user: User = Depends(required_user),
                           db: Session = Depends(get_db)) -> schemas.ChatListResponse:
     chats = await crud.get_chats(db, pagination, user)
-    chats = services.setup_default_chat_photo(user, chats)
+    chats = services.setup_default_chat_photo_and_title(user, chats)
     return {"status": True, "chats": chats}

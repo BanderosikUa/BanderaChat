@@ -48,17 +48,18 @@ async def required_user(Authorize: AuthJWT = Depends(),
     return User.from_orm(user)
 
 async def websocket_required_user(websocket: WebSocket,
-                                  csrf_token: str = Query(...),
+                                #   csrf_token: str = Query(...),
+                                  token: str = Query(...),
                                   Authorize: AuthJWT = Depends(),
                                   db: Session = Depends(get_db)
                                   ) -> User:
-    LOGGER.info(csrf_token)
     await manager.connect(websocket)
     try:
-        Authorize.jwt_required("websocket", websocket=websocket,
-                               csrf_token=csrf_token)
+        # Authorize.jwt_required("websocket", websocket=websocket,
+        #                        csrf_token=csrf_token)
+        Authorize.jwt_required("websocket", token=token)
         await websocket.send_text("Successfully Login!")
-        user_id = Authorize.get_raw_jwt()
+        user_id = Authorize.get_raw_jwt(token)
         user = await crud.get_user_by_id(db, user_id)
 
         if not user:

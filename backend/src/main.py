@@ -2,7 +2,7 @@ import json
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.exceptions import RequestValidationError, ValidationError
+from fastapi.exceptions import RequestValidationError, ValidationError, HTTPException
 import fastapi.openapi.utils as fu
 
 from starlette.responses import JSONResponse
@@ -30,6 +30,13 @@ app.add_middleware(
 @app.get("/")
 def home():
     return "Hello, Worldfasdsadff!"
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request, exc):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"status": "error", "detail": exc.detail},
+    )
 
 @app.exception_handler(RequestValidationError)
 @app.exception_handler(ValidationError)

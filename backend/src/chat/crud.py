@@ -1,5 +1,6 @@
 from fastapi import Depends
 
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from src.config import LOGGER
@@ -12,7 +13,7 @@ from src.auth.schemas import User as UserSchema
 
 from src.chat.schemas import MessageCreate, ChatCreate
 from src.chat.models import Chat, Message
-from src.chat.exceptions import DirectChatAlreadyExists
+from src.chat.exceptions import DirectChatAlreadyExists, DirectParticipantListMustHave2Objs
 
 
 async def get_chat_by_id(db: Session, chat_id: int) -> Chat | None:
@@ -40,9 +41,10 @@ async def create_chat(db: Session, chat: ChatCreate, user: UserSchema) -> Chat:
     users_db = await get_users_list_by_ids(db, users_ids)
     
     if len(users_db) == 2:
-        if get_direct_chat(db, users_db):
+        if await get_direct_chat_by_particips(db, users_db):
             raise DirectChatAlreadyExists
         chat.is_direct = True
+        chat.title = f"{chat.participants[0].username} - {chat.participants[1].username}" 
     
     chat = chat.dict()
         
@@ -57,13 +59,17 @@ async def create_chat(db: Session, chat: ChatCreate, user: UserSchema) -> Chat:
     
     return db_chat
 
-async def get_direct_chat(db: Session, participants: list[User]) -> Chat:
-    participants_ids = [user.id for user in participants]
+async def get_direct_chat_by_particips(db: Session, participants: list[User]) -> Chat:
+    if len(participants) != 2:
+        raise DirectParticipantListMustHave2Objs
+    user1, user2 = participants
+    # participants_ids = [user.id for user in participants]
     select_query = db.query(Chat).filter(
-        Chat.participants.id._in(participants_ids),
+        Chat.participants.any(id=user1.id),
+        Chat.participants.any(id=user2.id),
         Chat.is_direct == True
         )
-
+    
     return select_query.one_or_none()
 
 async def get_chats(db: Session, 

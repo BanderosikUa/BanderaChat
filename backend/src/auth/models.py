@@ -11,8 +11,8 @@ from src.chat.models import chat_participants, chat_moderators, users_read_messa
 friends_table = Table(
     "friends",
     Base.metadata,
-    Column("user_id", Integer, ForeignKey("user.id")),
-    Column("friend_id", Integer, ForeignKey("user.id")),
+    Column("user_id", Integer, ForeignKey("user.id", ondelete='CASCADE')),
+    Column("friend_id", Integer, ForeignKey("user.id", ondelete='CASCADE')),
 )
 
 

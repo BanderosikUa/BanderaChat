@@ -6,18 +6,18 @@ from sqlalchemy.orm import relationship
 from src.database import Base
 
 chat_moderators = Table('chat_moderators', Base.metadata,
-    Column('user_id', Integer, ForeignKey('user.id')),
-    Column('chat_id', Integer, ForeignKey('chat.id'))
+    Column('user_id', Integer, ForeignKey('user.id', ondelete="CASCADE")),
+    Column('chat_id', Integer, ForeignKey('chat.id', ondelete="CASCADE"))
 )
 
 chat_participants = Table('chat_participants', Base.metadata,
-    Column('user_id', Integer, ForeignKey('user.id')),
-    Column('chat_id', Integer, ForeignKey('chat.id'))
+    Column('user_id', Integer, ForeignKey('user.id', ondelete="CASCADE")),
+    Column('chat_id', Integer, ForeignKey('chat.id', ondelete="CASCADE"))
 )
 
 users_read_messages = Table("users_read_messages", Base.metadata,
-    Column('user_id', Integer, ForeignKey('user.id')),
-    Column('message_id', Integer, ForeignKey('message.id'))
+    Column('user_id', Integer, ForeignKey('user.id', ondelete="CASCADE")),
+    Column('message_id', Integer, ForeignKey('message.id', ondelete="CASCADE"))
 )
 
 class Message(Base):
@@ -32,9 +32,9 @@ class Message(Base):
                         default=datetime.datetime.now, nullable=False)
     
     # foreing keys
-    chat_id = Column(Integer, ForeignKey("chat.id"))
+    chat_id = Column(Integer, ForeignKey("chat.id", ondelete="CASCADE"))
     chat = relationship("Chat", back_populates="messages")
-    user_id = Column(Integer, ForeignKey("user.id"))
+    user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"))
     user = relationship("User", back_populates="messages")
     
     # manytomany
@@ -51,7 +51,7 @@ class Chat(Base):
     
     photo = Column(String(55), default="", nullable=False)
     
-    creator_id = Column(Integer, ForeignKey("user.id"))
+    creator_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"))
     creator = relationship("User", back_populates="chats_creator")
     
     # many to many

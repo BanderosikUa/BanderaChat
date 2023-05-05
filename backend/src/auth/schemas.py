@@ -4,7 +4,7 @@ from typing import Optional
 
 from pydantic import EmailStr, Field, validator, constr, root_validator
 
-from src.config import LOGGER
+from src.config import LOGGER, bucket
 from src.models import ORJSONModel
 from src.schemas import AllOptional
 
@@ -64,6 +64,16 @@ class UserLogin(ORJSONModel):
     
 class User(UserBase):
     id: int
+    
+    @validator('photo', pre=True)
+    def photo_formater(cls, v, values) -> str:
+        if values.get("photo") and not "http" in values.get("photo", ""):
+            photo = bucket.blob(values["photo"]).public_url
+        elif v and not "http" in v:
+            photo = bucket.blob(v).public_url
+        else:
+            photo = v
+        return photo
     
     class Config:
         orm_mode = True

@@ -20,13 +20,17 @@
         <div class="sidebar-body">
             <perfect-scrollbar>
                 <ul class="list-group list-group-flash">
-                    <li v-for="n in 20" :key="n" @click="selectChat(n)" class="list-group-item open-chat">
+                    <li v-for="chat in chats" :key="chat.id" @click="selectChat(chat.id)" class="list-group-item open-chat">
                         <figure class="avatar avatar-state-success">
-                            <img src="https://i.pinimg.com/736x/80/17/86/80178693d1d0c7e0ec688707b02ecc0b.jpg"
+                            <!-- <img 
+                                src="https://i.pinimg.com/736x/80/17/86/80178693d1d0c7e0ec688707b02ecc0b.jpg"
+                                class="rounded-circle" alt="avatar"> -->
+                            <img 
+                                :src="chat.photo"
                                 class="rounded-circle" alt="avatar">
                         </figure>
                         <div class="users-list-body">
-                            <h5>Townsend Seary</h5>
+                            <h5>{{ chat.title }}</h5>
                             <p>What's up, how are you?</p>
                             <div class="users-list-action action-toggle">
                                 <div class="new-message-count">3</div>
@@ -48,12 +52,29 @@
 </template>
   
 <script>
+import axios from 'axios'
 
 export default {
+    data(){
+        return{
+            chats: []
+        }
+    },
+    async created(){
+        try{
+            const response = await axios.get('chats')
+
+        console.log(response)
+
+        this.chats = response.data.chats
+        } catch(e){
+            console.log(e)
+        }
+    },
     methods: {
         selectChat(id){
             console.log(id)
-            this.$emit('id-selected', id)
+            this.$emit('chat-selected', id)
         }
     }
 }

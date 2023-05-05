@@ -1,8 +1,8 @@
 <template>
   <div class="sidebar-group chats container">
     <div class="row sidebar-row">
-      <ChatSidebar @id-selected="selectedId = $event"></ChatSidebar>
-      <ChatItem v-if="selectedId" :id="selectedId"></ChatItem>
+      <ChatSidebar @chat-selected="selectedChat = $event"></ChatSidebar>
+      <ChatItem v-if="selectedChat" :id="selectedChat"></ChatItem>
     </div>
   </div>
 </template>
@@ -20,20 +20,21 @@ export default {
   },
   data() {
     return {
-      selectedId: null
+      selectedChat: null
     }
   },
   mounted() {
     // Retrieve the selected ID from local storage and set it as the selectedId
-    const selectedId = localStorage.getItem('selectedId');
-    if (selectedId) {
-      this.selectedId = parseInt(selectedId);
+    const selectedChat = localStorage.getItem('selectedChat');
+    console.log(selectedChat)
+    if (selectedChat) {
+      this.selectedChat = parseInt(selectedChat);
     }
   },
   watch: {
     // Watch the selectedId property and store it in local storage when it changes
-    selectedId(newId) {
-      localStorage.setItem('selectedId', newId.toString());
+    selectedChat(newId) {
+      localStorage.setItem('selectedChat', newId.toString());
     }
   }
 }

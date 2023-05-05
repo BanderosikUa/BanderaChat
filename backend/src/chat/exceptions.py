@@ -1,4 +1,4 @@
-from src.exceptions import BadRequest, NotFound
+from src.exceptions import BadRequest, NotFound, CustomValidationError
 
 from src.chat.constants import ErrorCode
 
@@ -10,3 +10,7 @@ class ChatNotFound(NotFound):
 
 class DirectChatAlreadyExists(BadRequest):
     DETAIL = ErrorCode.ChatAlreadyExists
+
+class DirectParticipantListMustHave2Objs(CustomValidationError):
+    FIELD = "participants"
+    DETAIL = ErrorCode.ListOfTwoObjs

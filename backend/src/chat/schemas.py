@@ -23,7 +23,7 @@ class Message(MessageBase):
         orm_mode = True
         
 class ChatBase(BaseModel):
-    title: str
+    title: Optional[str]
     participants: List[User] = []
     is_direct: bool = False
     created_at: Optional[datetime]

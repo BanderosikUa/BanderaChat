@@ -47,7 +47,6 @@ async def register_user(
 
 @router.get('/me', response_model=UserResponse)
 async def get_me(user: User = Depends(required_user)):
-    LOGGER.info(user.dict())
     user = userResponseEntity(user)
     
     return {"status": "success", "user": user}
