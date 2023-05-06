@@ -30,8 +30,6 @@ async def websocket_endpoint(websocket: WebSocket,
                              chat: schemas.Chat = Depends(valid_chat),
                              user: User = Depends(websocket_required_user),
                              db: Session = Depends(get_db)):
-    # await manager.connect(websocket)
-    chat = schemas.Chat(id=1, title='test')
     try:
         while True:
             data = await websocket.receive_text()
