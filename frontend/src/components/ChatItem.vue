@@ -59,55 +59,62 @@
 
 <script>
 // import io from 'socket.io-client'
+import axios from 'axios'
 
 
 export default {
-  props: {
-    id: {
-      type: Number,
-      required: true
-    }
-  },
   data(){
     return {
-      messages: [
-        { content: 'What are you doing this?', time: '01:20 PM', type: 'incoming-message' },
-        { content: 'What are you doing this?', time: '01:20 PM', type: 'incoming-message' },
-        { content: 'What are you doing this?', time: '01:20 PM', type: 'incoming-message' },
-        { content: 'What are you doing this?', time: '01:20 PM', type: 'incoming-message' },
-        { content: 'What are you doing this?', time: '01:20 PM', type: 'incoming-message' },
-        { content: 'What are you doing this?', time: '01:20 PM', type: 'incoming-message' },
-        { content: 'What are you doing this?', time: '01:20 PM', type: 'incoming-message' },
-        { content: 'What are you doing this?', time: '01:20 PM', type: 'incoming-message' },
-        { content: 'What are you doing this?', time: '01:20 PM', type: 'incoming-message' },
-      ],
+      messages: [],
+      chat: null, 
       newMessage: '',
+      connection: null,
     }
   },
-  // mounted() {
-  //   this.socket = io(`chats/${this.id}/ws`)
-
-  //   this.socket.on('connect', () => {
-  //     console.log('Connected to server')
-  //   })
-
-  //   this.socket.on('message', (data) => {
-  //     console.log('Received message:', data)
-  //     this.addMessage(data)
-  //   })
-  // },
   async created(){
     await this.$nextTick()
-
     this.scrollDown();
+
+    console.log(this.$route.params.id)
+
+    try{
+        const response = await axios.get(`chats/${this.$route.params.id}`)
+
+        console.log(response)
+        if (response.data.status === true){
+          this.chat = response.data.chat
+          this.messages = response.data.messages
+        }
+        } catch(e){
+            console.log(e)
+    }
+
+
+    console.log("Starting connection to WebSocket Server")
+    this.connection = new WebSocket(`ws://127.0.0.1:5000/chats/${this.$route.params.id}/ws?token=${localStorage.getItem('access_token')}`)
+
+    this.connection.onmessage = function(event) {
+      console.log(event);
+    }
+
+    this.connection.onopen = function(event) {
+      console.log(event)
+      console.log("Successfully connected to the echo websocket server...")
+    }
   },
+  // computed: { key () { if(this.$route.name == 'chat-detail') { return this.$route.name } else { return this.$route.fullPath } } },
   methods: {
     async sendMessage() {
       if (this.newMessage.trim() !== '') {
         const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         this.messages.push({ content: this.newMessage, time: time, type: 'outgoing-message' })
-        this.newMessage = ''
         
+        console.log(this.newMessage)
+        console.log(this.connection);
+        const data = {action: "send_message", message: this.newMessage}
+        this.connection.send(JSON.stringify(data));
+        
+        this.newMessage = ''
         await this.$nextTick()
         this.scrollDown()
       }

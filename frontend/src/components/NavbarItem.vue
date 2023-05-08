@@ -11,7 +11,7 @@
         </header>
         <ul class="menu-links">
             <li class="nav-link">
-                <router-link to="Chats">
+                <router-link :to="{name: 'chats'}">
                     <i class='bx bx-chat icon'></i>
                 </router-link>
             </li>

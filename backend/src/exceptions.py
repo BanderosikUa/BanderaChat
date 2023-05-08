@@ -30,7 +30,7 @@ class BadRequest(DetailedHTTPException):
     STATUS_CODE = status.HTTP_400_BAD_REQUEST
     DETAIL = "Bad Request"
     
-class DetailedBadRequest(RequestValidationError):
+class DetailedBadRequest(HTTPException):
     STATUS_CODE = status.HTTP_400_BAD_REQUEST
     
     def __init__(self, detail, **kwargs: dict[str, Any]) -> None:

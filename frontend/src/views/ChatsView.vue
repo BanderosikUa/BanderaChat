@@ -1,8 +1,7 @@
 <template>
   <div class="sidebar-group chats container">
     <div class="row sidebar-row">
-      <ChatSidebar @chat-selected="selectedChat = $event"></ChatSidebar>
-      <ChatItem v-if="selectedChat" :id="selectedChat"></ChatItem>
+      <ChatSidebar></ChatSidebar>
     </div>
   </div>
 </template>
@@ -11,32 +10,11 @@
 // import axios from 'axios'
 // import PerfectScrollbar from 'vue3-perfect-scrollbar'
 import ChatSidebar from '@/components/ChatSidebar.vue'
-import ChatItem from '@/components/ChatItem.vue';
 
 export default {
   components: {
     ChatSidebar,
-    ChatItem
   },
-  data() {
-    return {
-      selectedChat: null
-    }
-  },
-  mounted() {
-    // Retrieve the selected ID from local storage and set it as the selectedId
-    const selectedChat = localStorage.getItem('selectedChat');
-    console.log(selectedChat)
-    if (selectedChat) {
-      this.selectedChat = parseInt(selectedChat);
-    }
-  },
-  watch: {
-    // Watch the selectedId property and store it in local storage when it changes
-    selectedChat(newId) {
-      localStorage.setItem('selectedChat', newId.toString());
-    }
-  }
 }
 </script>
 

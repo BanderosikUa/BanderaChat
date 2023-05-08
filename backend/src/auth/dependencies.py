@@ -59,7 +59,7 @@ async def websocket_required_user(websocket: WebSocket,
         #                        csrf_token=csrf_token)
         Authorize.jwt_required("websocket", token=token)
         await websocket.send_text("Successfully Login!")
-        user_id = Authorize.get_raw_jwt(token)
+        user_id = Authorize.get_raw_jwt(token)['sub']
         user = await crud.get_user_by_id(db, user_id)
 
         if not user:
@@ -69,6 +69,7 @@ async def websocket_required_user(websocket: WebSocket,
         #     raise NotVerified('You are not verified')
 
     except AuthJWTException as err:
+        LOGGER.error(err.message)
         await websocket.send_text(err.message)
         await websocket.close()
         raise err

@@ -7,20 +7,6 @@ from src.auth.schemas import User
 
 from pydantic import BaseModel
 
-class MessageBase(BaseModel):
-    user_id: int
-    chat_id: int
-    message: str
-    
-class MessageCreate(MessageBase):
-    pass
-
-class Message(MessageBase):
-    id: int
-    created_at: datetime
-    updated_at: datetime
-    class Config:
-        orm_mode = True
         
 class ChatBase(BaseModel):
     title: Optional[str]
@@ -50,3 +36,28 @@ class ChatResponse(BaseModel):
 class ChatListResponse(BaseModel):
     status: bool
     chats: List[Chat]
+
+class MessageBase(BaseModel):
+    user: User
+    chat: Chat
+    message: str
+    
+class MessageCreate(MessageBase):
+    pass
+
+class Message(MessageBase):
+    id: int
+    created_at: datetime
+    updated_at: datetime
+    class Config:
+        orm_mode = True
+        
+class WsData(BaseModel):
+    action: str = ""
+    user: User
+    message: Message
+    
+class ChatDetailResponse(BaseModel):
+    status: bool
+    chat: Chat
+    messages: List[Message]

@@ -82,7 +82,8 @@ async def login(payload: UserLogin, response: Response,
 
 
 @router.get('/refresh')
-async def refresh_token(response: Response, Authorize: AuthJWT = Depends(),
+async def refresh_token(response: Response, 
+                        Authorize: AuthJWT = Depends(),
                         db: Session = Depends(get_db)):
     try:
         Authorize.jwt_refresh_token_required()

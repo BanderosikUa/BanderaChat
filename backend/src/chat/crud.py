@@ -22,14 +22,20 @@ async def get_chat_by_id(db: Session, chat_id: int) -> Chat | None:
     return select_query.one_or_none()
 
 async def create_message(db: Session, message: MessageCreate) -> None:
-    message = message.dict()
-    db_message = Message(**message)
+    # message = message.dict()
+    # LOGGER.info(message)
+    # message['chat_id'] = message['chat']['id']
+    # message['user_id'] = message['user']['id']
+    
+    db_message = Message(user_id=message.user.id, 
+                         chat_id=message.chat.id,
+                         message=message.message)
     
     db.add(db_message)
     db.commit()
     db.refresh(db_message)
     
-    # return db_message
+    return db_message
 
 async def create_chat(db: Session, chat: ChatCreate, user: UserSchema) -> Chat:
     if user not in chat.participants:
@@ -81,5 +87,11 @@ async def get_chats(db: Session,
     select_query = db.query(Chat).filter(Chat.participants.any(id=user.id))
     select_query = select_query.offset(pagination.skip)
     select_query= select_query.limit(pagination.limit)
+
+    return select_query.all()
+
+async def get_messages_by_chat_id(db: Session,
+                                  chat_id: int) -> list[Message]:
+    select_query = db.query(Message).filter(Message.chat.has(Chat.id == chat_id))
 
     return select_query.all()
