@@ -17,8 +17,6 @@ export default{
         try{
             const response = await axios.get('auth/me')
 
-        console.log(response)
-
         this.user = response.data.user
         } catch(e){
             console.log(e)

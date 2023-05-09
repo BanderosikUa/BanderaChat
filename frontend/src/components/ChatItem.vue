@@ -1,15 +1,15 @@
 <template>
   <div class="content col-9">
     <!-- Hello World {{ id }} -->
-    <div class="chat">
+    <div class="chat" v-if="isLoading">
       <div class="chat-header">
         <div class="chat-header-user">
           <figure class="avatar avatar-state-success">
-            <img src="https://i.pinimg.com/736x/80/17/86/80178693d1d0c7e0ec688707b02ecc0b.jpg" class="rounded-circle"
+            <img :src="chat.photo" class="rounded-circle"
               alt="avatar">
           </figure>
           <div>
-            <h5>Townsend Seary</h5>
+            <h5>{{ chat.title }}</h5>
             <small class="text-muted"><i>Online</i></small>
           </div>
         </div>
@@ -35,12 +35,7 @@
       <perfect-scrollbar class="scrollbar-container" :settings="scrollbarSettings" ref="messages">
         <div class="chat-body">
           <div class="messages">
-            <div v-for="(message, index) in messages" :key="index" class="message-item" :class="message.type">
-              <div class="message-content">{{ message.content }}</div>
-              <div class="message-action">{{ message.time }}
-                <!-- <i v-if="message.type === 'outgoing-message'" class="ti-double-check text-info"></i> -->
-              </div>
-            </div>
+            <message-item v-for="message in messages" :key="message.id" :message="message"></message-item>
           </div>
         </div>
       </perfect-scrollbar>
@@ -54,63 +49,51 @@
         </form>
       </div>
     </div>
+    <div class="chat" v-else>
+      Loading
+    </div>
   </div>
 </template>
 
 <script>
 // import io from 'socket.io-client'
 import axios from 'axios'
+import MessageItem from "./MessageItem.vue"
 
 
 export default {
+  components: {
+    MessageItem,
+  },
   data(){
     return {
       messages: [],
       chat: null, 
       newMessage: '',
       connection: null,
+      isLoading: false,
     }
   },
   async created(){
-    await this.$nextTick()
-    this.scrollDown();
-
-    console.log(this.$route.params.id)
-
-    try{
-        const response = await axios.get(`chats/${this.$route.params.id}`)
-
-        console.log(response)
-        if (response.data.status === true){
-          this.chat = response.data.chat
-          this.messages = response.data.messages
-        }
-        } catch(e){
-            console.log(e)
-    }
-
-
-    console.log("Starting connection to WebSocket Server")
-    this.connection = new WebSocket(`ws://127.0.0.1:5000/chats/${this.$route.params.id}/ws?token=${localStorage.getItem('access_token')}`)
-
-    this.connection.onmessage = function(event) {
-      console.log(event);
-    }
-
-    this.connection.onopen = function(event) {
-      console.log(event)
-      console.log("Successfully connected to the echo websocket server...")
-    }
+    
+    this.$watch(
+      () => this.$route.params,
+      () => {
+        this.fetchData()
+        this.connectWs()
+      },
+      // fetch the data when the view is created and the data is
+      // already being observed
+      { immediate: true }
+      )
   },
   // computed: { key () { if(this.$route.name == 'chat-detail') { return this.$route.name } else { return this.$route.fullPath } } },
   methods: {
     async sendMessage() {
       if (this.newMessage.trim() !== '') {
         const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        this.messages.push({ content: this.newMessage, time: time, type: 'outgoing-message' })
+        this.messages.push({ message: this.newMessage, created_at: time, type: 'own' })
         
-        console.log(this.newMessage)
-        console.log(this.connection);
         const data = {action: "send_message", message: this.newMessage}
         this.connection.send(JSON.stringify(data));
         
@@ -119,9 +102,52 @@ export default {
         this.scrollDown()
       }
     },
+    async fetchData(){
+      try{
+          const response = await axios.get(`chats/${this.$route.params.id}`)
+
+          console.log(response)
+          if (response.data.status === true){
+            this.chat = response.data.chat
+            this.messages = response.data.messages
+            
+            this.isLoading = true
+
+            await this.$nextTick()
+            this.scrollDown();
+          }
+          } catch(e){
+              console.log(e)
+      }
+    },
+    connectWs(){
+      console.log("Starting connection to WebSocket Server")
+      const vm = this;
+      this.connection = new WebSocket(`ws://127.0.0.1:5000/chats/${this.$route.params.id}/ws?token=${localStorage.getItem('access_token')}`)
+
+      this.connection.onmessage = function(event) {
+        let data = JSON.parse(event.data)
+        if (data.action === "newMessage"){
+          vm.messages.push({message: data.message.message, created_at: data.message.created_at, type: data.message.type})
+        }
+      }
+
+      this.connection.onopen = function(event) {
+        console.log(event)
+        console.log("Successfully connected to the echo websocket server...")
+      }
+    },
     scrollDown() {
       const messagesContainer = this.$refs.messages.$el
       messagesContainer.scrollTop = messagesContainer.scrollHeight
+    }
+  },
+  computed: {
+    messageType(){
+      return {
+        "outgoing-message": this.message.type === "own",
+        "": this.message.type === "other"
+      }
     }
   }
 }
@@ -194,35 +220,6 @@ export default {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-}
-
-.chat .chat-body .messages .message-item:last-child {
-    margin-bottom: 0;
-}
-
-.chat .chat-body .messages .message-item {
-    max-width: 75%;
-    /* margin-bottom: 20px; */
-}
-
-.chat .chat-body .messages .message-item .message-content {
-    background: #fff;
-    border-radius: 5px;
-    padding: 10px 20px;
-}
-.chat .chat-body .messages .message-item .message-action {
-    color: #828282;
-    margin-top: 5px;
-    font-style: italic;
-    font-size: 12px;
-}
-
-.chat .chat-body .messages .message-item.outgoing-message {
-    margin-left: auto;
-}
-
-.chat .chat-body .messages .message-item.outgoing-message .message-content {
-    background-color: #cdcdcd;
 }
 
 </style>

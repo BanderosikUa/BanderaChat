@@ -13,7 +13,7 @@ from src.constants import DB_NAMING_CONVENTION
 
 DATABASE_URL = settings.DATABASE_URL
 
-engine = create_engine(DATABASE_URL)
+engine = create_engine(DATABASE_URL, pool_pre_ping=True, pool_size=32, max_overflow=64)
 
 SessionLocal = sessionmaker(
     autocommit=False,

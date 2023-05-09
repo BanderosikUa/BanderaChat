@@ -12,7 +12,7 @@ class AuthConfig(BaseSettings):
     JWT_PUBLIC_KEY: str
     JWT_PRIVATE_KEY: str
     REFRESH_TOKEN_EXPIRES_IN: int = 60
-    ACCESS_TOKEN_EXPIRES_IN: int = 60*2
+    ACCESS_TOKEN_EXPIRES_IN: int = 60*24*2
     JWT_ALGORITHM: str = "RS256"
     
     CLIENT_ORIGIN: str = "http://localhost:3000"

@@ -20,8 +20,7 @@
         <div class="sidebar-body">
             <perfect-scrollbar>
                 <ul class="list-group list-group-flash">
-                    <li v-for="chat in chats" :key="chat.id" class="list-group-item open-chat">
-                        <RouterLink>
+                    <li v-for="chat in chats" :key="chat.id" @click="selectChat(chat.id)" class="list-group-item open-chat">
                         <figure class="avatar avatar-state-success">
                             <!-- <img 
                                 src="https://i.pinimg.com/736x/80/17/86/80178693d1d0c7e0ec688707b02ecc0b.jpg"
@@ -44,11 +43,7 @@
                                 </div>
                             </div>
                         </div>
-                        
-                        <transition name="view" mode="out-in" appear>
-                            <router-view :key="chat.id"></router-view>
-                        </transition>
-                        </RouterLink>
+                    
                     </li>
                 </ul>
             </perfect-scrollbar>
@@ -86,7 +81,7 @@ export default {
     methods: {
         selectChat(chat){
             console.log(chat)
-            this.$router.push({ name: 'chat-detail', params: { id: chat } });
+            this.$router.replace({ name: 'chat-detail', params: { id: chat } });
         }
     }
 }

@@ -39,25 +39,34 @@ class ChatListResponse(BaseModel):
 
 class MessageBase(BaseModel):
     user: User
-    chat: Chat
     message: str
     
 class MessageCreate(MessageBase):
-    pass
+    chat: Chat
 
 class Message(MessageBase):
     id: int
+    chat: Chat
     created_at: datetime
     updated_at: datetime
+    class Config:
+        orm_mode = True
+        
+class MessageResponse(MessageBase):
+    id: int
+    created_at: datetime
+    updated_at: datetime
+    type: Optional[str]  # own message or other
+    
     class Config:
         orm_mode = True
         
 class WsData(BaseModel):
     action: str = ""
     user: User
-    message: Message
+    message: MessageResponse
     
 class ChatDetailResponse(BaseModel):
     status: bool
     chat: Chat
-    messages: List[Message]
+    messages: List[MessageResponse]

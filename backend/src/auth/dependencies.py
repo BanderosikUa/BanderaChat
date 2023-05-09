@@ -58,19 +58,19 @@ async def websocket_required_user(websocket: WebSocket,
         # Authorize.jwt_required("websocket", websocket=websocket,
         #                        csrf_token=csrf_token)
         Authorize.jwt_required("websocket", token=token)
-        await websocket.send_text("Successfully Login!")
         user_id = Authorize.get_raw_jwt(token)['sub']
         user = await crud.get_user_by_id(db, user_id)
-
+        
         if not user:
             raise WebSocketException(code=status.WS_1008_POLICY_VIOLATION)
+        
+        user = User.from_orm(user)
 
-        # if not user["verified"]:
-        #     raise NotVerified('You are not verified')
+        await manager.on_online(websocket, user)
 
     except AuthJWTException as err:
         LOGGER.error(err.message)
-        await websocket.send_text(err.message)
-        await websocket.close()
+        await manager.on_error(websocket, err.message)
         raise err
-    return User.from_orm(user)
+
+    return user

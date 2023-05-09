@@ -30,6 +30,12 @@ async def websocket_endpoint(websocket: WebSocket,
                              chat: schemas.Chat = Depends(websocket_valid_chat),
                              user: User = Depends(websocket_required_user),
                              db: Session = Depends(get_db)):
+    """
+    WebSocket endpoint that accepts a WebSocket connection.
+
+    This endpoint will accept incoming WebSocket connections and will send
+    a message to the client every second.
+    """
     try:
         while True:
             data = await websocket.receive_json()
@@ -39,7 +45,8 @@ async def websocket_endpoint(websocket: WebSocket,
                 user=user, chat=chat, message=data['message'],
                 )
             message = await crud.create_message(db, message)
-            message = schemas.Message.from_orm(message)
+            message = schemas.MessageResponse.from_orm(message)
+            message.type = "other"
             
             data['message'] = message
             
@@ -47,19 +54,15 @@ async def websocket_endpoint(websocket: WebSocket,
                                   user=user,
                                   message=message)
             LOGGER.info(data)
-            # todo: make message read by user
-            # LOGGER.debug(data)
-            # await manager.send_personal_message(message, websocket)
             
             await manager.on_receive(websocket, data)
     except WebSocketDisconnect as err:
         LOGGER.info(err)
         LOGGER.info(f"{user.id} disconnected in {chat.id} chat")
         await manager.disconnect(websocket)
-        # message = schemas.MessageCreate(
-        #     user.id, chat.id, f"Client #{user.id}"
-        #     )
-        # await manager.broadcast(message, websocket, add_to_db=False)
+    except Exception as e:
+        LOGGER.info(e)
+        
 
 @router.post("/chats")
 async def create_chat(chat_data: schemas.ChatCreate,
@@ -82,6 +85,9 @@ async def get_users_chats(pagination: PaginationParams = Depends(),
 
 @router.get("/chats/{chat_id}")
 async def get_chat_detail(chat = Depends(valid_chat),
+                          user: User = Depends(required_user),
                           db: Session = Depends(get_db)) -> schemas.ChatDetailResponse:
     messages = await crud.get_messages_by_chat_id(db, chat_id=chat.id)
+    messages = services.setup_message_type(user, messages)
+    chat = services.setup_default_chat_photo_and_title(user, [chat])[0]
     return {"status": True, "chat": chat, "messages": messages}

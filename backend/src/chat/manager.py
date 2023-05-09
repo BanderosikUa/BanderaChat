@@ -3,7 +3,7 @@ import json
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 
 from src.config import LOGGER
-from src.chat.schemas import MessageCreate, WsData
+from src.chat.schemas import MessageCreate, WsData, User
 from src.chat.crud import create_message
 
 
@@ -39,34 +39,45 @@ class WebSocketManager:
     async def actions_not_allowed(self, websocket: WebSocket, data: dict | None) -> None:
         await websocket.send_json({'action': 'Not found'})
         
-    async def on_receive(self, websocket: WebSocket, data: WsData) -> None:
+    async def on_receive(self, websocket: WebSocket | None, data: WsData) -> None:
         if data.action in self.actions:
             handler = getattr(self, data.action, self.actions_not_allowed)
         else:
             handler = self.actions_not_allowed
         LOGGER.info(handler.__name__)
         return await handler(websocket, data)
-
+    
 class ConnectionManager(WebSocketManager):
-    actions = ['join', 'send_message', 'close']
-    manager = WebSocketManager()
+    actions = ['join', 'send_message', 'close', 'delete', 'edit']
+    
+    async def on_online(self, websocket: WebSocket, user: User) -> None:
+        await self.broadcast({'action': 'online', 
+                              'user': json.loads(user.json())})
+        
+    async def on_error(self, websocket: WebSocket, message: str) -> None:
+        await websocket.send_json({"action": "error", "message": message})
+        await websocket.close()
 
-    async def join(self, websocket: WebSocket, data: WsData) -> None:
-        await self.manager.broadcast({'action': 'join', 
-                                      'message': f"{data.user.id} connected"})
+    async def join(self, websocket: WebSocket | None, data: WsData) -> None:
+        await self.broadcast({'action': 'join',
+                              "user": json.loads(data.user.json()),
+                              'message': f"{data.user.username} join the chat"})
 
     async def close(self, websocket: WebSocket, data: WsData) -> None:
-        await self.manager.disconnect(websocket)
+        await self.disconnect(websocket)
         await self.broadcast_exclude(
             [websocket],
-            {'action': 'disconnect', 'message': f"{data.user.id} disconnected"}
+            {'action': 'disconnect', 
+             "user": json.loads(data.user.json()),
+             'message': f"{data.user.username} has disconnected"}
         )
 
     async def send_message(self, websocket: WebSocket, data: WsData) -> None:
-        await self.manager.broadcast({
+        data.message.type = "other"
+        await self.broadcast_exclude([websocket], {
             'action': 'newMessage',
-            'username': data.user.username,
-            'message': data.message.json()
+            'user': json.loads(data.user.json()),
+            'message': json.loads(data.message.json())
         })
                 
 manager = ConnectionManager()
