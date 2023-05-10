@@ -30,8 +30,7 @@ async def register_user(
     auth_data: UserRegister,
     db: Session = Depends(get_db)
 ) -> dict[str, str | dict]:
-    delattr(auth_data, "passwordConfirm")
-    
+    LOGGER.info(type(auth_data))
     if await crud.get_user_by_email(db, auth_data.email):
         raise exceptions.EmailTaken()
     

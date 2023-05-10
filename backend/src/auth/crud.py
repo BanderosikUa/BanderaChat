@@ -20,12 +20,13 @@ async def create_user(db: Session, user: UserRegister) -> User | None:
     user.password = hashed_pasword
     
     if not user.photo:
-        user = random.choice(
+        user.photo = random.choice(
             ["default.png", "default1.png", 
              "default2.png", "default3.png"]
             )
-        
+    
     user = user.dict()
+    del user['passwordConfirm']
     
     db_user = User(**user)
     db.add(db_user)

@@ -1,5 +1,7 @@
 # Chat Websocket
 
+Url path: ```ws://{server_ip}/chats/{chat_id}/ws```
+
 ### Send message(on send)
 Need to send data to websocket with this format
 

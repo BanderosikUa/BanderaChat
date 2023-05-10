@@ -45,7 +45,7 @@ class UserRegister(UserBase):
         
         if password and password != v:
             raise ValueError(ErrorCode.PASSWORD_NOT_MATCH)
-        return values
+        return v
     
     
 class UserLogin(ORJSONModel):
