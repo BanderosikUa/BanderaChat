@@ -10,6 +10,9 @@ class ChatNotFound(NotFound):
 
 class DirectChatAlreadyExists(BadRequest):
     DETAIL = ErrorCode.ChatAlreadyExists
+    
+class ChatUserNotExists(BadRequest):
+    DETAIL = ErrorCode.ChatUserNotExists
 
 class DirectParticipantListMustHave2Objs(CustomValidationError):
     FIELD = "participants"

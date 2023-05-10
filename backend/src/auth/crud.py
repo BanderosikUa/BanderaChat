@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from src import utils
 from src.config import LOGGER, bucket
+from src.schemas import PaginationParams
 
 from src.auth.models import User, RefreshToken
 from src.auth.config import auth_config
@@ -44,6 +45,13 @@ async def get_user_by_id(db: Session, user_id: int) -> User | None:
 
 async def get_users_list_by_ids(db: Session, user_ids: list[int]) -> list[User]:
     select_query = db.query(User).filter(User.id.in_(user_ids))
+
+    return select_query.all()
+
+async def get_all_users(db: Session, pagination: PaginationParams) -> list[User]:
+    select_query = db.query(User)
+    select_query = select_query.offset(pagination.skip)
+    select_query= select_query.limit(pagination.limit)
 
     return select_query.all()
 

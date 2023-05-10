@@ -46,6 +46,9 @@ async def create_chat(db: Session, chat: ChatCreate, user: UserSchema) -> Chat:
     user_db = await get_user_by_id(db, user.id)
     users_db = await get_users_list_by_ids(db, users_ids)
     
+    if len(users_db) == 1:
+        raise 
+    
     if len(users_db) == 2:
         if await get_direct_chat_by_particips(db, users_db):
             raise DirectChatAlreadyExists

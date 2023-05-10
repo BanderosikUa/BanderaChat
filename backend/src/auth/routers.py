@@ -6,12 +6,13 @@ from sqlalchemy.orm import Session
 from src.config import LOGGER, bucket
 from src.exceptions import DetailedBadRequest
 from src.database import get_db
+from src.schemas import PaginationParams
 
 from src.auth import crud, exceptions
 from src.auth.schemas import (
     User, UserLogin, UserResponse,
-    UserBase, UserRegister, AccessTokenResponse)
-from src.auth.serializers import userResponseEntity
+    UserBase, UserRegister, AccessTokenResponse,
+    UserResponseList)
 from src.auth.oa2auth import AuthJWT
 from src.auth.services import authenticate_user
 from src.auth.dependencies import required_user
@@ -24,13 +25,11 @@ ACCESS_TOKEN_EXPIRES_IN = auth_config.ACCESS_TOKEN_EXPIRES_IN
 REFRESH_TOKEN_EXPIRES_IN = auth_config.REFRESH_TOKEN_EXPIRES_IN
 
 
-@router.post("/register", status_code=status.HTTP_201_CREATED,
-             response_model=UserResponse)
+@router.post("/register", status_code=status.HTTP_201_CREATED)
 async def register_user(
     auth_data: UserRegister,
     db: Session = Depends(get_db)
-) -> dict[str, str | dict]:
-    LOGGER.info(type(auth_data))
+) -> UserResponse:
     if await crud.get_user_by_email(db, auth_data.email):
         raise exceptions.EmailTaken()
     
@@ -38,17 +37,24 @@ async def register_user(
         raise exceptions.UsernameTaken()
     
     user = await crud.create_user(db, auth_data)
-    user_entity = userResponseEntity(user)
     return {
         "status": "success",
-        "user": user_entity,
+        "user": user,
     }
 
-@router.get('/me', response_model=UserResponse)
-async def get_me(user: User = Depends(required_user)):
-    user = userResponseEntity(user)
-    
+@router.get('/me')
+async def get_me(user: User = Depends(required_user)) -> UserResponse:
     return {"status": "success", "user": user}
+
+@router.get("/users")
+async def get_all_users(pagination: PaginationParams = Depends(),
+                        user = Depends(required_user),
+                        db: Session = Depends(get_db)) -> UserResponseList:
+    users = await crud.get_all_users(db, pagination)
+    
+    return {"status": "success", "users": users}
+    
+    
 
 @router.post("/login", response_model=AccessTokenResponse)
 async def login(payload: UserLogin, response: Response,
@@ -83,7 +89,7 @@ async def login(payload: UserLogin, response: Response,
 @router.get('/refresh')
 async def refresh_token(response: Response, 
                         Authorize: AuthJWT = Depends(),
-                        db: Session = Depends(get_db)):
+                        db: Session = Depends(get_db)) -> AccessTokenResponse:
     try:
         Authorize.jwt_refresh_token_required()
 

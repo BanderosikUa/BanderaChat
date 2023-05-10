@@ -13,3 +13,4 @@ class ErrorCode:
     CHAT_NOT_FOUND="Chat not found."
     ChatAlreadyExists="This direct chat already exists"
     ListOfTwoObjs="Must be a list of 2 objects"
+    ChatUserNotExists="User not exists"
