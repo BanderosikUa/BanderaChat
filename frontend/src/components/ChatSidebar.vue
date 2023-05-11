@@ -5,13 +5,19 @@
             <ul class="list-inline">
                 <li class="list-inline-item">
                     <div>
-                        <button class="btn btn-light" id="Tooltip-Add-Group">
+                        <button @click="createChatGroup" class="btn btn-light" id="Tooltip-Add-Group">
                             <i class='bx bxs-group'></i>
                         </button>
+                        <chat-create-popup ref="chatCreatePopup"></chat-create-popup>
+                        <!-- <v-select :options="userList" label="name"></v-select> -->
+                        <!-- <chat-create-popup ></chat-create-popup> -->
                     </div>
                 </li>
-                <li class="list-inline-item"><button class="btn btn-light" id="Tooltip-New-Chat"><i
-                            class="bx bxs-chat"></i></button></li>
+                <li class="list-inline-item">
+                    <button class="btn btn-light" id="Tooltip-New-Chat">
+                        <i class="bx bxs-chat"></i>
+                    </button>
+                </li>
             </ul>
         </header>
         <form>
@@ -25,9 +31,7 @@
                             <!-- <img 
                                 src="https://i.pinimg.com/736x/80/17/86/80178693d1d0c7e0ec688707b02ecc0b.jpg"
                                 class="rounded-circle" alt="avatar"> -->
-                            <img 
-                                :src="chat.photo"
-                                class="rounded-circle" alt="avatar">
+                            <img :src="chat.photo" class="rounded-circle" alt="avatar">
                         </figure>
                         <div class="users-list-body">
                             <h5>{{ chat.title }}</h5>
@@ -43,7 +47,7 @@
                                 </div>
                             </div>
                         </div>
-                    
+
                     </li>
                 </ul>
             </perfect-scrollbar>
@@ -60,36 +64,77 @@
   
 <script>
 import axios from 'axios'
+import ChatCreatePopup from './ChatCreatePopup.vue'
+// import Swal from 'sweetalert2';
+import vSelect from 'vue-select'
 
 export default {
-    data(){
-        return{
-            chats: []
+    components:{
+        ChatCreatePopup,
+        vSelect
+    },
+    data() {
+        return {
+            chats: [],
         }
     },
-    async created(){
-        try{
+    async created() {
+        try {
             const response = await axios.get('chats')
 
-        console.log(response)
+            console.log(response)
 
-        this.chats = response.data.chats
-        } catch(e){
+            this.chats = response.data.chats
+        } catch (e) {
             console.log(e)
         }
     },
     methods: {
-        selectChat(chat){
+        selectChat(chat) {
             console.log(chat)
             this.$router.replace({ name: 'chat-detail', params: { id: chat } });
-        }
+        },
+    //     async createChatGroup() {
+    // // Load the list of users from your backend API or wherever you're storing them
+
+    //         const { value: formValues } = await Swal.fire({
+    //         title: 'Create a new chat group',
+    //         html: `
+    //             <input id="swal-input-group-name" class="swal2-input" placeholder="Group name" required>
+    //             <input id="swal-input-group-description" class="swal2-input" placeholder="Group description">
+    //             <v-select id="swal-input-group-users" :options="userList" label="name" multiple>
+    //                 <template #option="{ option }">
+    //                 <div>{{ option.name }}</div>
+    //                 </template>
+    //             </v-select>
+    //             `,
+    //         focusConfirm: false,
+    //         preConfirm: () => {
+    //             return [
+    //             document.getElementById('swal-input-group-name').value,
+    //             Array.from(document.getElementById('swal-input-group-users').selectedOptions).map(option => option.value),
+    //             ];
+    //         },
+    //         });
+
+    //         if (formValues) {
+    //             const [groupName, groupDescription, groupUsers] = formValues;
+    //             console.log(groupName)
+    //             console.log(groupDescription)
+    //             console.log(groupUsers)
+
+    //         // Send request to create chat group using groupName, groupDescription, and groupUsers
+    //         }
+    //     },
+        createChatGroup() {
+            this.$refs.chatCreatePopup.openDialog();
+        },
     }
 }
 
 </script>
   
 <style scoped>
-
 .sidebar {
     background: #fff;
     border-radius: 5px;

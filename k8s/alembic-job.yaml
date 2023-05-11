@@ -7,7 +7,7 @@ spec:
     spec:
       containers:
         - name: webregi-v2-app
-          image: banderosik/banderachat-backend:v1.0.0
+          image: banderosik/banderachat-backend:v1.1
           command: ["/bin/sh","-c"]
           args: ["alembic upgrade head"]
           env:

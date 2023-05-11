@@ -13,7 +13,7 @@ from src.auth.schemas import User as UserSchema
 
 from src.chat.schemas import MessageCreate, ChatCreate
 from src.chat.models import Chat, Message
-from src.chat.exceptions import DirectChatAlreadyExists, DirectParticipantListMustHave2Objs
+from src.chat.exceptions import DirectChatAlreadyExists, DirectParticipantListMustHave2Objs, ChatUserNotExists
 
 
 async def get_chat_by_id(db: Session, chat_id: int) -> Chat | None:
@@ -43,11 +43,14 @@ async def create_chat(db: Session, chat: ChatCreate, user: UserSchema) -> Chat:
     
     users_ids = [user.id for user in chat.participants]
     
+    if len(users_ids) == 1:
+        raise DirectParticipantListMustHave2Objs
+    
     user_db = await get_user_by_id(db, user.id)
     users_db = await get_users_list_by_ids(db, users_ids)
     
     if len(users_db) == 1:
-        raise 
+        raise ChatUserNotExists
     
     if len(users_db) == 2:
         if await get_direct_chat_by_particips(db, users_db):

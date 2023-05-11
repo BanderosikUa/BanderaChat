@@ -50,7 +50,7 @@ async def get_me(user: User = Depends(required_user)) -> UserResponse:
 async def get_all_users(pagination: PaginationParams = Depends(),
                         user = Depends(required_user),
                         db: Session = Depends(get_db)) -> UserResponseList:
-    users = await crud.get_all_users(db, pagination)
+    users = await crud.get_all_users(db, pagination, user)
     
     return {"status": "success", "users": users}
     

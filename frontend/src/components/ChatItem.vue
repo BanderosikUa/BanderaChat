@@ -123,7 +123,7 @@ export default {
     connectWs(){
       console.log("Starting connection to WebSocket Server")
       const vm = this;
-      this.connection = new WebSocket(`ws://127.0.0.1:5000/chats/${this.$route.params.id}/ws?token=${localStorage.getItem('access_token')}`)
+      this.connection = new WebSocket(`${this.$config.wsUrl}/chats/${this.$route.params.id}/ws?token=${localStorage.getItem('access_token')}`)
 
       this.connection.onmessage = function(event) {
         let data = JSON.parse(event.data)

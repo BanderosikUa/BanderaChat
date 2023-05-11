@@ -9,13 +9,13 @@ from src import utils
 from src.config import LOGGER, bucket
 from src.schemas import PaginationParams
 
+from src.auth import schemas
 from src.auth.models import User, RefreshToken
 from src.auth.config import auth_config
 from src.auth.exceptions import InvalidCredentials
-from src.auth.schemas import UserRegister, UserLogin
 from src.auth.security import check_password, hash_password
 
-async def create_user(db: Session, user: UserRegister) -> User | None:
+async def create_user(db: Session, user: schemas.UserRegister) -> User | None:
     hashed_pasword = hash_password(user.password)
     
     user.password = hashed_pasword
@@ -48,8 +48,8 @@ async def get_users_list_by_ids(db: Session, user_ids: list[int]) -> list[User]:
 
     return select_query.all()
 
-async def get_all_users(db: Session, pagination: PaginationParams) -> list[User]:
-    select_query = db.query(User)
+async def get_all_users(db: Session, pagination: PaginationParams, user: User) -> list[User]:
+    select_query = db.query(User).filter(User.id != user.id)
     select_query = select_query.offset(pagination.skip)
     select_query= select_query.limit(pagination.limit)
 
@@ -100,7 +100,7 @@ async def expire_refresh_token(db: Session, refresh_token_uuid: UUID4) -> None:
     db.refresh(db_refresh_token)
 
 
-async def authenticate_user(db: Session, auth_data: UserLogin) -> User:
+async def authenticate_user(db: Session, auth_data: schemas.UserLogin) -> User:
     user = await get_user_by_username(auth_data.username)
     if auth_data.email:
         user = await get_user_by_email(db, auth_data.email)
