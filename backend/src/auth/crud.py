@@ -22,8 +22,8 @@ async def create_user(db: Session, user: schemas.UserRegister) -> User | None:
     
     if not user.photo:
         user.photo = random.choice(
-            ["default.png", "default1.png", 
-             "default2.png", "default3.png"]
+            ["default.png", "default2.png", 
+             "default3.png", "default4.png"]
             )
     
     user = user.dict()
