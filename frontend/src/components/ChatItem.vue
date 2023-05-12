@@ -2,51 +2,101 @@
   <div class="content col-9">
     <!-- Hello World {{ id }} -->
     <div class="chat" v-if="isLoading">
-      <div class="chat-header">
-        <div class="chat-header-user">
-          <figure class="avatar avatar-state-success">
-            <img :src="chat.photo" class="rounded-circle"
-              alt="avatar">
-          </figure>
-          <div>
-            <h5>{{ chat.title }}</h5>
-            <small class="text-muted"><i>Online</i></small>
+      <div class="direct" v-if="chat.is_direct">
+        <div class="chat-header">
+          <div class="chat-header-user">
+            <figure class="avatar avatar-state-success">
+              <img :src="chat.photo" class="rounded-circle"
+                alt="avatar">
+            </figure>
+            <div>
+              <h5>{{ chat.title }}</h5>
+              <small class="text-muted"><i>Online</i></small>
+            </div>
+          </div>
+          <div class="chat-header-action">
+            <ul class="list-inline">
+              <li class="list-inline-item" data-toggle="tooltip" title="Detail">
+                <div class="dropdown">
+                  <span data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" class="">
+                    <button class="btn btn-secondary"><i class='bx bx-dots-horizontal-rounded'></i></button>
+                  </span>
+                  <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu dropdown-menu-right"><button
+                      type="button" tabindex="0" role="menuitem" class="dropdown-item">Profile</button><button type="button"
+                      tabindex="0" role="menuitem" class="dropdown-item">Add to archive</button><button type="button"
+                      tabindex="0" role="menuitem" class="dropdown-item">Delete</button>
+                    <div tabindex="-1" class="dropdown-divider"></div><button type="button" tabindex="0" role="menuitem"
+                      class="dropdown-item">Block</button>
+                  </div>
+                </div>
+              </li>
+            </ul>
           </div>
         </div>
-        <div class="chat-header-action">
-          <ul class="list-inline">
-            <li class="list-inline-item" data-toggle="tooltip" title="Detail">
-              <div class="dropdown">
-                <span data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" class="">
-                  <button class="btn btn-secondary"><i class='bx bx-dots-horizontal-rounded'></i></button>
-                </span>
-                <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu dropdown-menu-right"><button
-                    type="button" tabindex="0" role="menuitem" class="dropdown-item">Profile</button><button type="button"
-                    tabindex="0" role="menuitem" class="dropdown-item">Add to archive</button><button type="button"
-                    tabindex="0" role="menuitem" class="dropdown-item">Delete</button>
-                  <div tabindex="-1" class="dropdown-divider"></div><button type="button" tabindex="0" role="menuitem"
-                    class="dropdown-item">Block</button>
-                </div>
-              </div>
-            </li>
-          </ul>
+        <perfect-scrollbar class="scrollbar-container" :settings="scrollbarSettings" ref="messages">
+          <div class="chat-body">
+            <div class="messages">
+              <message-item v-for="message in messages" :key="message.id" :message="message"></message-item>
+            </div>
+          </div>
+        </perfect-scrollbar>
+        <div class="chat-footer">
+          <form @submit.prevent="sendMessage">
+            <input v-model="newMessage" placeholder="Write a message." type="text" class="form-control form-control">
+            <div class="form-buttons">
+                  <button class="btn-floating btn btn-light"><i class='bx bx-paperclip'></i></button>
+                  <button class="btn-floating btn btn-light"><i class='bx bxs-microphone'></i></button>
+                  <button class="btn-floating btn btn-primary"><i class='bx bxs-send' ></i></button></div>
+          </form>
         </div>
       </div>
-      <perfect-scrollbar class="scrollbar-container" :settings="scrollbarSettings" ref="messages">
-        <div class="chat-body">
-          <div class="messages">
-            <message-item v-for="message in messages" :key="message.id" :message="message"></message-item>
+      <div class="group" v-else>
+        <div class="chat-header">
+          <div class="chat-header-user">
+            <figure class="avatar avatar-state-success">
+              <img :src="chat.photo" class="rounded-circle"
+                alt="avatar">
+            </figure>
+            <div>
+              <h5>{{ chat.title }}</h5>
+              <small class="text-muted"><i>{{ chat.participants.length }} Members</i></small>
+            </div>
+          </div>
+          <div class="chat-header-action">
+            <ul class="list-inline">
+              <li class="list-inline-item" data-toggle="tooltip" title="Detail">
+                <div class="dropdown">
+                  <span data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" class="">
+                    <button class="btn btn-secondary"><i class='bx bx-dots-horizontal-rounded'></i></button>
+                  </span>
+                  <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu dropdown-menu-right"><button
+                      type="button" tabindex="0" role="menuitem" class="dropdown-item">Profile</button><button type="button"
+                      tabindex="0" role="menuitem" class="dropdown-item">Add to archive</button><button type="button"
+                      tabindex="0" role="menuitem" class="dropdown-item">Delete</button>
+                    <div tabindex="-1" class="dropdown-divider"></div><button type="button" tabindex="0" role="menuitem"
+                      class="dropdown-item">Block</button>
+                  </div>
+                </div>
+              </li>
+            </ul>
           </div>
         </div>
-      </perfect-scrollbar>
-      <div class="chat-footer">
-        <form @submit.prevent="sendMessage">
-          <input v-model="newMessage" placeholder="Write a message." type="text" class="form-control form-control">
-          <div class="form-buttons">
-                <button class="btn-floating btn btn-light"><i class='bx bx-paperclip'></i></button>
-                <button class="btn-floating btn btn-light"><i class='bx bxs-microphone'></i></button>
-                <button class="btn-floating btn btn-primary"><i class='bx bxs-send' ></i></button></div>
-        </form>
+        <perfect-scrollbar class="scrollbar-container" :settings="scrollbarSettings" ref="messages">
+          <div class="chat-body">
+            <div class="messages">
+              <message-item v-for="message in messages" :key="message.id" :message="message" :is-direct="chat.is_direct"></message-item>
+            </div>
+          </div>
+        </perfect-scrollbar>
+        <div class="chat-footer">
+          <form @submit.prevent="sendMessage">
+            <input v-model="newMessage" placeholder="Write a message." type="text" class="form-control form-control">
+            <div class="form-buttons">
+                  <button class="btn-floating btn btn-light"><i class='bx bx-paperclip'></i></button>
+                  <button class="btn-floating btn btn-light"><i class='bx bxs-microphone'></i></button>
+                  <button class="btn-floating btn btn-primary"><i class='bx bxs-send' ></i></button></div>
+          </form>
+        </div>
       </div>
     </div>
     <div class="chat" v-else>
@@ -121,6 +171,10 @@ export default {
       }
     },
     connectWs(){
+      if (this.connection != null){
+        this.connection.close()
+      }
+
       console.log("Starting connection to WebSocket Server")
       const vm = this;
       this.connection = new WebSocket(`${this.$config.wsUrl}/chats/${this.$route.params.id}/ws?token=${localStorage.getItem('access_token')}`)
@@ -140,16 +194,11 @@ export default {
     scrollDown() {
       const messagesContainer = this.$refs.messages.$el
       messagesContainer.scrollTop = messagesContainer.scrollHeight
+    },
+    closeWebSocket(){
+      this.connection.closeWebSocket()
     }
   },
-  computed: {
-    messageType(){
-      return {
-        "outgoing-message": this.message.type === "own",
-        "": this.message.type === "other"
-      }
-    }
-  }
 }
 </script>
 
@@ -165,19 +214,32 @@ export default {
   flex-direction: column;
 }
 
-.chat .chat-header {
+.chat .direct {
+  flex: 1 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.chat .group {
+  flex: 1 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-header {
   display: flex;
   justify-content: space-between;
   border-bottom: 2px solid #e1e1e1;
   padding-bottom: 20px;
 }
 
-.chat .chat-header .chat-header-user {
+.chat-header .chat-header-user {
   display: flex;
   align-items: center;
 }
 
-.chat .chat-header .chat-header-user h5 {
+.chat-header .chat-header-user h5 {
   font-size: 16px;
   font-weight: 600;
   margin-bottom: 0;
@@ -190,12 +252,12 @@ export default {
 }
 
 
-.chat .chat-footer {
+.chat-footer {
   border-top: 2px solid #e1e1e1;
   padding-top: 20px;
 }
 
-.chat .chat-footer form {
+.chat-footer form {
   display: flex;
   padding: 10px;
   border-radius: 5px;
@@ -203,20 +265,20 @@ export default {
   background-color: #fff;
 }
 
-.chat .chat-footer form input[type=text] {
+.chat-footer form input[type=text] {
     border: none;
     background-color: inherit;
 }
 
-.chat .chat-footer form .form-buttons {
+.chat-footer form .form-buttons {
     display: flex;
 }
 
-.chat .chat-footer form .form-buttons .btn {
+.chat-footer form .form-buttons .btn {
     margin-left: 0.5rem;
 }
 
-.chat .chat-body .messages {
+.chat-body .messages {
     display: flex;
     flex-direction: column;
     align-items: flex-start;

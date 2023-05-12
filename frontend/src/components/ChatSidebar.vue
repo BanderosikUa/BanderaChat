@@ -92,44 +92,12 @@ export default {
     methods: {
         selectChat(chat) {
             console.log(chat)
-            this.$router.replace({ name: 'chat-detail', params: { id: chat } });
+            this.$router.push({ name: 'chats', params: { id: chat } });
         },
-    //     async createChatGroup() {
-    // // Load the list of users from your backend API or wherever you're storing them
-
-    //         const { value: formValues } = await Swal.fire({
-    //         title: 'Create a new chat group',
-    //         html: `
-    //             <input id="swal-input-group-name" class="swal2-input" placeholder="Group name" required>
-    //             <input id="swal-input-group-description" class="swal2-input" placeholder="Group description">
-    //             <v-select id="swal-input-group-users" :options="userList" label="name" multiple>
-    //                 <template #option="{ option }">
-    //                 <div>{{ option.name }}</div>
-    //                 </template>
-    //             </v-select>
-    //             `,
-    //         focusConfirm: false,
-    //         preConfirm: () => {
-    //             return [
-    //             document.getElementById('swal-input-group-name').value,
-    //             Array.from(document.getElementById('swal-input-group-users').selectedOptions).map(option => option.value),
-    //             ];
-    //         },
-    //         });
-
-    //         if (formValues) {
-    //             const [groupName, groupDescription, groupUsers] = formValues;
-    //             console.log(groupName)
-    //             console.log(groupDescription)
-    //             console.log(groupUsers)
-
-    //         // Send request to create chat group using groupName, groupDescription, and groupUsers
-    //         }
-    //     },
         createChatGroup() {
             this.$refs.chatCreatePopup.openDialog();
         },
-    }
+    },
 }
 
 </script>

@@ -27,7 +27,7 @@ export default {
       dialog: false,
       groupName: '',
       selectedUsers: [],
-      users: null
+      users: [],
     };
   },
   methods: {
@@ -67,7 +67,7 @@ export default {
     },
   },
   async created(){
-    await axios.get('auth/users').then(response => {
+    await axios.get('auth/users?limit=100').then(response => {
         console.log(response.data)
         if (response.data.status === "success"){
           this.users = response.data.users
