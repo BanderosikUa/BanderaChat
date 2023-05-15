@@ -1,27 +1,26 @@
 <template>
-    <div class="sidebar-group chats container">
-      <div class="row sidebar-row">
-        <ChatSidebar></ChatSidebar>
-        <!-- <router-view></router-view> -->
-      </div>
-    </div>
-  </template>
+        <!-- <ChatSidebar></ChatSidebar> -->
+        <ChatItem :key="selectedChat"></ChatItem>
+</template>
   
 <script>
-// import axios from 'axios'
-// import PerfectScrollbar from 'vue3-perfect-scrollbar'
-import ChatSidebar from '@/components/ChatSidebar.vue'
-// import ChatItem from '@/components/ChatItem.vue';
+
+// import ChatSidebar from '@/components/ChatSidebar.vue'
+import ChatItem from '@/components/ChatItem.vue';
 
 export default {
     components: {
-        ChatSidebar,
-        // ChatItem
+        // ChatSidebar,
+        ChatItem
     },
     data() {
         return {
             selectedChat: null
         }
+    },
+    created(){
+        console.log(this.$route.params.id)
+        this.selectedChat = this.$route.params.id
     },
 
 }

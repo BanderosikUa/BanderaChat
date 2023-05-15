@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from fastapi import WebSocketDisconnect
 from fastapi_jwt_auth import AuthJWT
 from fastapi_jwt_auth.exceptions import AuthJWTException
 from fastapi import (
@@ -60,6 +61,7 @@ async def websocket_required_user(websocket: WebSocket,
         Authorize.jwt_required("websocket", token=token)
         user_id = Authorize.get_raw_jwt(token)['sub']
         user = await crud.get_user_by_id(db, user_id)
+
         
         if not user:
             raise WebSocketException(code=status.WS_1008_POLICY_VIOLATION)
@@ -72,5 +74,14 @@ async def websocket_required_user(websocket: WebSocket,
         LOGGER.error(err.message)
         await manager.on_error(websocket, err.message)
         raise err
+    
+    except WebSocketDisconnect as err:
+        LOGGER.info(err)
+        LOGGER.info(f"{user.id} disconnected")
+        await manager.disconnect(websocket)
+        
+    except Exception as err:
+        LOGGER.info(err)
+        await manager.disconnect(websocket)
 
     return user

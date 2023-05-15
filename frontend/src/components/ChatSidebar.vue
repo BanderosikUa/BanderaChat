@@ -92,7 +92,7 @@ export default {
     methods: {
         selectChat(chat) {
             console.log(chat)
-            this.$router.push({ name: 'chats', params: { id: chat } });
+            this.$router.push({ name: 'chat-detail', params: { id: chat } });
         },
         createChatGroup() {
             this.$refs.chatCreatePopup.openDialog();

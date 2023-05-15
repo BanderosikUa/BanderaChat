@@ -18,7 +18,7 @@
             </div> -->
         </div>
         <div class="message-item" :class="messageType">
-            <h9>{{ message.user.username }}</h9>
+            <text-subtitle-2>{{ message.user.username }}</text-subtitle-2>
             <div class="message-content">
                 {{ message.message }}
             </div>

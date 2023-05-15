@@ -23,7 +23,7 @@ def setup_message_type(user: auth_schemas.User,
                        messages: list[Message]) -> list[chat_schemas.MessageResponse]:
     messages = [chat_schemas.MessageResponse.from_orm(message_db) for message_db in messages]
     for message in messages:
-        if message.user == user:
+        if message.user.id == user.id:
             message.type = "own"
         else:
             message.type = "other"

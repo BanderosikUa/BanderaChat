@@ -44,7 +44,6 @@ class WebSocketManager:
             handler = getattr(self, data.action, self.actions_not_allowed)
         else:
             handler = self.actions_not_allowed
-        LOGGER.info(handler.__name__)
         return await handler(websocket, data)
     
 class ConnectionManager(WebSocketManager):
@@ -56,7 +55,7 @@ class ConnectionManager(WebSocketManager):
         
     async def on_error(self, websocket: WebSocket, message: str) -> None:
         await websocket.send_json({"action": "error", "message": message})
-        await websocket.close()
+        await self.disconnect(websocket)
 
     async def join(self, websocket: WebSocket | None, data: WsData) -> None:
         await self.broadcast({'action': 'join',

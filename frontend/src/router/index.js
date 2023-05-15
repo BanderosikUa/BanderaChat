@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import ChatsView from '../views/ChatsView.vue'
-import HomeView from '@/views/HomeView'
-import LoginView from '@/views/LoginView'
+import HomeView from '@/views/HomeView.vue'
+import LoginView from '@/views/LoginView.vue'
+import ChatDetailView from '@/views/ChatDetailView.vue'
 
 const routes = [
   {
@@ -10,9 +10,16 @@ const routes = [
     component: HomeView,
   },
   {
-    path: '/chats/:id?',
+    path: '/chats',
     name: 'chats',
-    component: ChatsView
+    component: () => import(/* webpackChunkName: "about" */ '../views/ChatsView.vue'),
+    children: [
+      {
+        path: ":id",
+        name: "chat-detail",
+        component: ChatDetailView
+      }
+    ]
   },
   {
     path: '/login',
@@ -29,11 +36,11 @@ const routes = [
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
-  }
+  },
 ]
 
 const router = createRouter({
-  mode: 'history',
+  // mode: 'history',
   history: createWebHistory(process.env.BASE_URL),
   routes
 })
@@ -48,7 +55,7 @@ router.beforeEach(function(to, from, next){
       isAuthenticated= false;
     if ( to.name !== 'login' && !isAuthenticated ){
       next({
-        path: 'login',
+        name: 'login',
         replace: true
       })
     } else {

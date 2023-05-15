@@ -108,7 +108,7 @@
 <script>
 // import io from 'socket.io-client'
 import axios from 'axios'
-import MessageItem from "./MessageItem.vue"
+import MessageItem from "@/components/MessageItem.vue"
 
 
 export default {
@@ -125,7 +125,6 @@ export default {
     }
   },
   async created(){
-    
     this.$watch(
       () => this.$route.params,
       () => {
@@ -153,25 +152,26 @@ export default {
       }
     },
     async fetchData(){
-      try{
-          const response = await axios.get(`chats/${this.$route.params.id}`)
-
-          console.log(response)
+      console.log(this.$route.params.id)
+      await axios.get(`chats/${this.$route.params.id}`).then(response => {
+          console.log(response.data)
           if (response.data.status === true){
             this.chat = response.data.chat
             this.messages = response.data.messages
             
             this.isLoading = true
 
-            await this.$nextTick()
-            this.scrollDown();
           }
-          } catch(e){
-              console.log(e)
-      }
+        }).catch(e =>{
+          console.log(e)
+          alert(JSON.stringify(e.response.data, null, 2))
+          
+        })
+      await this.$nextTick()
+      this.scrollDown();
     },
     connectWs(){
-      if (this.connection != null){
+      if (this.connection !== null){
         this.connection.close()
       }
 
@@ -195,9 +195,6 @@ export default {
       const messagesContainer = this.$refs.messages.$el
       messagesContainer.scrollTop = messagesContainer.scrollHeight
     },
-    closeWebSocket(){
-      this.connection.closeWebSocket()
-    }
   },
 }
 </script>

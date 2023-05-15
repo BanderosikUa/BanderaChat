@@ -86,6 +86,16 @@ class UserEmbedded(UserBase):
     
     class Config:
         orm_mode = True
+        
+    @validator('photo', pre=True)
+    def photo_formater(cls, v, values) -> str:
+        if values.get("photo") and not "http" in values.get("photo", ""):
+            photo = bucket.blob(values["photo"]).public_url
+        elif v and not "http" in v:
+            photo = bucket.blob(v).public_url
+        else:
+            photo = v
+        return photo
 
 class UserResponse(ORJSONModel):
     status: str
