@@ -1,4 +1,5 @@
 import random
+import string
 
 from sqlalchemy.orm import Session
 
@@ -39,4 +40,3 @@ async def authenticate_user(db: Session, auth_data: UserLogin) -> User:
 #         LOGGER.error(e)
 #         user.photo = ""
 #     return user 
-        

@@ -1,31 +1,52 @@
+import json
+
 from datetime import datetime
 from typing import List, Optional
 
-from src.schemas import AllOptional
+from src.config import bucket
+from src.schemas import AllOptional, ORJSONModel
 
 from src.auth.schemas import User, UserEmbedded
 
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 
         
-class ChatBase(BaseModel):
+class ChatBase(ORJSONModel):
     title: Optional[str]
     participants: List[User] = []
     is_direct: bool = False
+    photo: str = ""
     created_at: Optional[datetime]
     updated_at: Optional[datetime]
     
 class ChatCreate(ChatBase):
-    pass
+    @classmethod 
+    def __get_validators__(cls): 
+        yield cls._validate_from_json_string 
+    
+    @classmethod 
+    def _validate_from_json_string(cls, value): 
+        if isinstance(value, str): 
+            return cls.validate(json.loads(value.encode())) 
+        return cls.validate(value)
     
 class Chat(ChatBase, metaclass=AllOptional):
     id: int
     is_direct: bool
-    photo: str
     moderators: List[User] = []
 
     class Config:
         orm_mode = True
+
+    @validator('photo', pre=True)
+    def photo_formater(cls, v, values) -> str:
+        if values.get("photo") and not "http" in values.get("photo", ""):
+            photo = bucket.blob(values["photo"]).public_url
+        elif v and not "http" in v:
+            photo = bucket.blob(v).public_url
+        else:
+            photo = v
+        return photo
         
         
 class ChatResponse(BaseModel):
@@ -65,7 +86,7 @@ class MessageResponse(MessageBase):
 class WsData(BaseModel):
     action: str = ""
     user: User
-    message: MessageResponse
+    message: MessageResponse | None
     
 class ChatDetailResponse(BaseModel):
     status: bool

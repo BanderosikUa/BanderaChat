@@ -6,8 +6,7 @@
         <div class="chat-header">
           <div class="chat-header-user">
             <figure class="avatar avatar-state-success">
-              <img :src="chat.photo" class="rounded-circle"
-                alt="avatar">
+              <img :src="chat.photo" class="rounded-circle" alt="avatar">
             </figure>
             <div>
               <h5>{{ chat.title }}</h5>
@@ -22,9 +21,9 @@
                     <button class="btn btn-secondary"><i class='bx bx-dots-horizontal-rounded'></i></button>
                   </span>
                   <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu dropdown-menu-right"><button
-                      type="button" tabindex="0" role="menuitem" class="dropdown-item">Profile</button><button type="button"
-                      tabindex="0" role="menuitem" class="dropdown-item">Add to archive</button><button type="button"
-                      tabindex="0" role="menuitem" class="dropdown-item">Delete</button>
+                      type="button" tabindex="0" role="menuitem" class="dropdown-item">Profile</button><button
+                      type="button" tabindex="0" role="menuitem" class="dropdown-item">Add to archive</button><button
+                      type="button" tabindex="0" role="menuitem" class="dropdown-item">Delete</button>
                     <div tabindex="-1" class="dropdown-divider"></div><button type="button" tabindex="0" role="menuitem"
                       class="dropdown-item">Block</button>
                   </div>
@@ -44,9 +43,10 @@
           <form @submit.prevent="sendMessage">
             <input v-model="newMessage" placeholder="Write a message." type="text" class="form-control form-control">
             <div class="form-buttons">
-                  <button class="btn-floating btn btn-light"><i class='bx bx-paperclip'></i></button>
-                  <button class="btn-floating btn btn-light"><i class='bx bxs-microphone'></i></button>
-                  <button class="btn-floating btn btn-primary"><i class='bx bxs-send' ></i></button></div>
+              <button class="btn-floating btn btn-light"><i class='bx bx-paperclip'></i></button>
+              <button class="btn-floating btn btn-light"><i class='bx bxs-microphone'></i></button>
+              <button class="btn-floating btn btn-primary"><i class='bx bxs-send'></i></button>
+            </div>
           </form>
         </div>
       </div>
@@ -54,8 +54,7 @@
         <div class="chat-header">
           <div class="chat-header-user">
             <figure class="avatar avatar-state-success">
-              <img :src="chat.photo" class="rounded-circle"
-                alt="avatar">
+              <img :src="chat.photo" class="rounded-circle" alt="avatar">
             </figure>
             <div>
               <h5>{{ chat.title }}</h5>
@@ -70,9 +69,9 @@
                     <button class="btn btn-secondary"><i class='bx bx-dots-horizontal-rounded'></i></button>
                   </span>
                   <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu dropdown-menu-right"><button
-                      type="button" tabindex="0" role="menuitem" class="dropdown-item">Profile</button><button type="button"
-                      tabindex="0" role="menuitem" class="dropdown-item">Add to archive</button><button type="button"
-                      tabindex="0" role="menuitem" class="dropdown-item">Delete</button>
+                      type="button" tabindex="0" role="menuitem" class="dropdown-item">Profile</button><button
+                      type="button" tabindex="0" role="menuitem" class="dropdown-item">Add to archive</button><button
+                      type="button" tabindex="0" role="menuitem" class="dropdown-item">Delete</button>
                     <div tabindex="-1" class="dropdown-divider"></div><button type="button" tabindex="0" role="menuitem"
                       class="dropdown-item">Block</button>
                   </div>
@@ -84,7 +83,8 @@
         <perfect-scrollbar class="scrollbar-container" :settings="scrollbarSettings" ref="messages">
           <div class="chat-body">
             <div class="messages">
-              <message-item v-for="message in messages" :key="message.id" :message="message" :is-direct="chat.is_direct"></message-item>
+              <message-item v-for="message in messages" :key="message.id" :message="message"
+                :is-direct="chat.is_direct"></message-item>
             </div>
           </div>
         </perfect-scrollbar>
@@ -92,9 +92,10 @@
           <form @submit.prevent="sendMessage">
             <input v-model="newMessage" placeholder="Write a message." type="text" class="form-control form-control">
             <div class="form-buttons">
-                  <button class="btn-floating btn btn-light"><i class='bx bx-paperclip'></i></button>
-                  <button class="btn-floating btn btn-light"><i class='bx bxs-microphone'></i></button>
-                  <button class="btn-floating btn btn-primary"><i class='bx bxs-send' ></i></button></div>
+              <button class="btn-floating btn btn-light"><i class='bx bx-paperclip'></i></button>
+              <button class="btn-floating btn btn-light"><i class='bx bxs-microphone'></i></button>
+              <button class="btn-floating btn btn-primary"><i class='bx bxs-send'></i></button>
+            </div>
           </form>
         </div>
       </div>
@@ -115,16 +116,16 @@ export default {
   components: {
     MessageItem,
   },
-  data(){
+  data() {
     return {
       messages: [],
-      chat: null, 
+      chat: null,
       newMessage: '',
       connection: null,
       isLoading: false,
     }
   },
-  async created(){
+  async created() {
     this.$watch(
       () => this.$route.params,
       () => {
@@ -134,7 +135,7 @@ export default {
       // fetch the data when the view is created and the data is
       // already being observed
       { immediate: true }
-      )
+    )
   },
   // computed: { key () { if(this.$route.name == 'chat-detail') { return this.$route.name } else { return this.$route.fullPath } } },
   methods: {
@@ -142,36 +143,36 @@ export default {
       if (this.newMessage.trim() !== '') {
         const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         this.messages.push({ message: this.newMessage, created_at: time, type: 'own' })
-        
-        const data = {action: "send_message", message: this.newMessage}
+
+        const data = { action: "send_message", message: this.newMessage }
         this.connection.send(JSON.stringify(data));
-        
+
         this.newMessage = ''
         await this.$nextTick()
         this.scrollDown()
       }
     },
-    async fetchData(){
+    async fetchData() {
       console.log(this.$route.params.id)
       await axios.get(`chats/${this.$route.params.id}`).then(response => {
-          console.log(response.data)
-          if (response.data.status === true){
-            this.chat = response.data.chat
-            this.messages = response.data.messages
-            
-            this.isLoading = true
+        console.log(response.data)
+        if (response.data.status === true) {
+          this.chat = response.data.chat
+          this.messages = response.data.messages
 
-          }
-        }).catch(e =>{
-          console.log(e)
-          alert(JSON.stringify(e.response.data, null, 2))
-          
-        })
+          this.isLoading = true
+
+        }
+      }).catch(e => {
+        console.log(e)
+        alert(JSON.stringify(e.response.data, null, 2))
+
+      })
       await this.$nextTick()
       this.scrollDown();
     },
-    connectWs(){
-      if (this.connection !== null){
+    connectWs() {
+      if (this.connection !== null) {
         this.connection.close()
       }
 
@@ -179,16 +180,29 @@ export default {
       const vm = this;
       this.connection = new WebSocket(`${this.$config.wsUrl}/chats/${this.$route.params.id}/ws?token=${localStorage.getItem('access_token')}`)
 
-      this.connection.onmessage = function(event) {
+      // Send ping message periodically
+      const pingInterval = setInterval(() => {
+        if (this.connection.readyState === WebSocket.OPEN) {
+          this.connection.send(JSON.stringify({ action: "ping" }));
+        }
+      }, 5000); // Adjust the interval as needed (e.g., every 5 seconds)
+
+      this.connection.onmessage = function (event) {
         let data = JSON.parse(event.data)
-        if (data.action === "newMessage"){
-          vm.messages.push({message: data.message.message, created_at: data.message.created_at, type: data.message.type})
+        if (data.action === "newMessage") {
+          vm.messages.push({ message: data.message.message, created_at: data.message.created_at, type: data.message.type })
         }
       }
 
-      this.connection.onopen = function(event) {
+      this.connection.onopen = function (event) {
         console.log(event)
         console.log("Successfully connected to the echo websocket server...")
+      }
+
+      this.connection.onclose = function (event) {
+        console.log(event)
+        console.log("Disconneted from websocket server")
+        clearInterval(pingInterval);
       }
     },
     scrollDown() {
@@ -200,7 +214,7 @@ export default {
 </script>
 
 <style scoped>
-.content{
+.content {
   display: flex;
   height: 95vh;
 }
@@ -217,6 +231,7 @@ export default {
   display: flex;
   flex-direction: column;
 }
+
 .chat .group {
   flex: 1 1;
   height: 100%;
@@ -244,10 +259,9 @@ export default {
 }
 
 .scrollbar-container {
-    position: relative;
-    height: 100%;
+  position: relative;
+  height: 100%;
 }
-
 
 .chat-footer {
   border-top: 2px solid #e1e1e1;
@@ -263,22 +277,21 @@ export default {
 }
 
 .chat-footer form input[type=text] {
-    border: none;
-    background-color: inherit;
+  border: none;
+  background-color: inherit;
 }
 
 .chat-footer form .form-buttons {
-    display: flex;
+  display: flex;
 }
 
 .chat-footer form .form-buttons .btn {
-    margin-left: 0.5rem;
+  margin-left: 0.5rem;
 }
 
 .chat-body .messages {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
-
 </style>

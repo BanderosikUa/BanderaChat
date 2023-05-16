@@ -24,7 +24,7 @@ class WebSocketManager:
     async def add_connection(self, websocket: WebSocket) -> None:
         self.connections.append(websocket)
 
-    async def send_message(self, websocket: WebSocket, message: dict) -> None:
+    async def send_personal_message(self, websocket: WebSocket, message: dict) -> None:
         await websocket.send_json(message)
 
     async def broadcast(self, message: dict) -> None:
@@ -47,14 +47,17 @@ class WebSocketManager:
         return await handler(websocket, data)
     
 class ConnectionManager(WebSocketManager):
-    actions = ['join', 'send_message', 'close', 'delete', 'edit']
-    
+    actions = ['join', 'send_message', 'close', 'delete', 'edit', "ping"]
+
+    async def ping(self, websocket: WebSocket, data: WsData):
+        await websocket.send_json({"action": "pong"})
+        
     async def on_online(self, websocket: WebSocket, user: User) -> None:
         await self.broadcast({'action': 'online', 
                               'user': json.loads(user.json())})
         
     async def on_error(self, websocket: WebSocket, message: str) -> None:
-        await websocket.send_json({"action": "error", "message": message})
+        await self.send_personal_message(websocket, {"action": "error", "message": message})
         await self.disconnect(websocket)
 
     async def join(self, websocket: WebSocket | None, data: WsData) -> None:

@@ -1,4 +1,7 @@
-from fastapi import Depends
+from fastapi import Depends, Form, status, HTTPException
+from fastapi.encoders import jsonable_encoder
+
+from pydantic import ValidationError
 
 from sqlalchemy.orm import Session
 
@@ -10,7 +13,7 @@ from src.auth.schemas import User
 from src.auth.crud import get_user_by_id
 
 from src.chat.crud import get_chat_by_id
-from src.chat.schemas import Chat
+from src.chat.schemas import Chat, ChatCreate
 from src.chat.exceptions import ChatPermissionRequired, ChatNotFound
 
 async def websocket_valid_chat(chat_id: int, 
@@ -38,3 +41,15 @@ async def valid_chat(chat_id: int,
         raise ChatPermissionRequired()
     
     return chat
+
+
+def chat_data_checker(data: str = Form(...)):
+    try:
+        model = ChatCreate.parse_raw(data)
+    except ValidationError as e:
+        raise HTTPException(
+            detail=jsonable_encoder(e.errors()),
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        )
+
+    return model

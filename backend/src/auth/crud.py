@@ -1,19 +1,16 @@
-import uuid
 import random
 from datetime import datetime, timedelta
 from pydantic import UUID4
 
 from sqlalchemy.orm import Session
 
-from src import utils
-from src.config import LOGGER, bucket
 from src.schemas import PaginationParams
 
 from src.auth import schemas
 from src.auth.models import User, RefreshToken
 from src.auth.config import auth_config
 from src.auth.exceptions import InvalidCredentials
-from src.auth.security import check_password, hash_password
+from src.auth.security import check_password, hash_password, generate_random_alphanum
 
 async def create_user(db: Session, user: schemas.UserRegister) -> User | None:
     hashed_pasword = hash_password(user.password)
@@ -68,9 +65,9 @@ async def get_user_by_username(db: Session, username: str) -> User | None:
 
 async def create_refresh_token(
     db: Session, *, user_id: int, refresh_token: str | None = None
-) -> str:
+    ) -> str:
     if not refresh_token:
-        refresh_token = utils.generate_random_alphanum(64)
+        refresh_token = generate_random_alphanum(64)
         
     db_refresh_token = RefreshToken(
         refresh_token=refresh_token,

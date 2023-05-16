@@ -24,7 +24,7 @@
             <input type="text" class="form-control" placeholder="Search chat">
         </form>
         <div class="sidebar-body">
-            <perfect-scrollbar>
+            <perfect-scrollbar class="scrollbar-container" :settings="scrollbarSettings">
                 <ul class="list-group list-group-flash">
                     <li v-for="chat in chats" :key="chat.id" @click="selectChat(chat.id)" class="list-group-item open-chat">
                         <figure class="avatar avatar-state-success">
@@ -112,6 +112,10 @@ export default {
     height: 95vh;
 }
 
+.scrollbar-container {
+    position: relative;
+    height: 100%;
+}
 .sidebar>header {
     display: flex;
     align-items: center;

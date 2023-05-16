@@ -5,8 +5,7 @@ from typing import Optional
 from pydantic import EmailStr, Field, validator, constr, root_validator
 
 from src.config import LOGGER, bucket
-from src.models import ORJSONModel
-from src.schemas import AllOptional
+from src.schemas import AllOptional, ORJSONModel
 
 from src.auth.constants import ErrorCode
 

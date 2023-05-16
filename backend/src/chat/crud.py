@@ -1,11 +1,7 @@
-from fastapi import Depends
-
-from sqlalchemy import func
 from sqlalchemy.orm import Session
 
-from src.config import LOGGER
-from src.database import get_db
 from src.schemas import PaginationParams
+from src.config import LOGGER
 
 from src.auth.crud import get_user_by_id, get_users_list_by_ids
 from src.auth.models import User
@@ -21,12 +17,7 @@ async def get_chat_by_id(db: Session, chat_id: int) -> Chat | None:
 
     return select_query.one_or_none()
 
-async def create_message(db: Session, message: MessageCreate) -> None:
-    # message = message.dict()
-    # LOGGER.info(message)
-    # message['chat_id'] = message['chat']['id']
-    # message['user_id'] = message['user']['id']
-    
+async def create_message(db: Session, message: MessageCreate) -> None:    
     db_message = Message(user_id=message.user.id, 
                          chat_id=message.chat.id,
                          message=message.message)

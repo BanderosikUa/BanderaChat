@@ -1,4 +1,8 @@
-from src.config import LOGGER
+from uuid import uuid4
+
+from fastapi import UploadFile
+
+from src.config import LOGGER, bucket
 
 from src.chat import schemas as chat_schemas
 from src.auth import schemas as auth_schemas
@@ -28,3 +32,12 @@ def setup_message_type(user: auth_schemas.User,
         else:
             message.type = "other"
     return messages
+
+def upload_photo(photo: UploadFile) -> str:
+    filename = f"{uuid4()}.jpg"
+    photo.filename = filename
+    
+    blob = bucket.blob(filename)
+    blob.upload_from_file(photo.file)
+    return filename
+    

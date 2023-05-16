@@ -1,22 +1,23 @@
 
 from fastapi import (
     APIRouter, WebSocket, WebSocketDisconnect,
-    Depends)
+    Depends, UploadFile, File, Body)
 
 from sqlalchemy.orm import Session
 
 from src.database import get_db
 from src.schemas import PaginationParams
+from src.config import LOGGER
 
 from src.auth.dependencies import required_user, websocket_required_user
 from src.auth.schemas import User
-from src.config import LOGGER
 
 from src.chat.manager import manager
 # from src.chat. import Chat
 from src.chat import crud, schemas, services
-from src.chat.dependencies import valid_chat, websocket_valid_chat
-
+from src.chat.dependencies import (
+    valid_chat, websocket_valid_chat, chat_data_checker
+)
 router = APIRouter()
 
 
@@ -41,6 +42,7 @@ async def websocket_endpoint(websocket: WebSocket,
             data = await websocket.receive_json()
             data['user'] = User
             
+            # move db session in manager
             message = schemas.MessageCreate(
                 user=user, chat=chat, message=data['message'],
                 )
@@ -61,14 +63,20 @@ async def websocket_endpoint(websocket: WebSocket,
         LOGGER.info(f"{user.id} disconnected in {chat.id} chat")
         await manager.disconnect(websocket)
     except Exception as e:
-        LOGGER.info(e)
+        LOGGER.info(str(e))
         
 
 @router.post("/chats")
-async def create_chat(chat_data: schemas.ChatCreate,
+async def create_chat(chat_data: schemas.ChatCreate = Body(...),
+                      photo: UploadFile | None = File(None),
                       user: User = Depends(required_user),
                       db: Session = Depends(get_db)) -> schemas.ChatResponse:
+    if photo:
+        photo = services.upload_photo(photo)
+        chat_data.photo = photo
+        
     chat = await crud.create_chat(db, chat_data, user)
+    
     return {'status': True, 'chat': chat}
     
 @router.get("/chats")

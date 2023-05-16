@@ -1,14 +1,13 @@
 import json
 
+import fastapi.openapi.utils as fu
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError, ValidationError, HTTPException
-import fastapi.openapi.utils as fu
 
 from starlette.responses import JSONResponse
 
-from src.config import app_configs, settings, LOGGER
-from src.database import SessionLocal
+from src.config import app_configs, settings
 from src.exceptions import CustomValidationError
 from src.schemas import ErrorResponse
 
@@ -48,7 +47,6 @@ async def validation_exception_handler(request, exc: RequestValidationError|Cust
         response['detail'].append({error['loc'][-1]: error['msg']})
 
     return JSONResponse(response, status_code=422)
-
 
 app.include_router(auth_router, prefix="/auth", tags=["Auth"])
 app.include_router(chat_router, tags=["Chat"])
