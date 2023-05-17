@@ -245,7 +245,7 @@ export default{
                 passwordConfirm: this.passwordConfirm,
             }
             await axios.post('auth/register', data).then(response => {
-                if (response.data.status === "success"){
+                if (response.data.status === true){
                     const wrapper = document.querySelector('.wrapper')
                     wrapper.classList.remove('active')
                 }
@@ -262,7 +262,7 @@ export default{
             }
             await axios.post('auth/login', data).then(response => {
                 console.log(response.data)
-                if (response.data.status === "success"){
+                if (response.data.status === true){
                     localStorage.setItem('access_token', response.data.access_token)
                     axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('access_token');
                     this.$router.push('/home')

@@ -7,7 +7,7 @@ from fastapi.exceptions import RequestValidationError, ValidationError, HTTPExce
 
 from starlette.responses import JSONResponse
 
-from src.config import app_configs, settings
+from src.config import app_configs, settings, LOGGER
 from src.exceptions import CustomValidationError
 from src.schemas import ErrorResponse
 
@@ -28,21 +28,22 @@ app.add_middleware(
 
 @app.get("/")
 def home():
-    return "Hello, Worldfasdsadff!"
+    return "Hello, World!"
 
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request, exc):
     return JSONResponse(
         status_code=exc.status_code,
-        content={"status": "error", "detail": exc.detail},
+        content={"status": False, "detail": exc.detail},
     )
 
 @app.exception_handler(RequestValidationError)
 @app.exception_handler(ValidationError)
 @app.exception_handler(CustomValidationError)
 async def validation_exception_handler(request, exc: RequestValidationError|CustomValidationError) -> ErrorResponse:
+    LOGGER.error(str(exc))
     exc_json = json.loads(exc.json())
-    response = {"status": "error", "detail": []}
+    response = {"status": False, "detail": []}
     for error in exc_json:
         response['detail'].append({error['loc'][-1]: error['msg']})
 

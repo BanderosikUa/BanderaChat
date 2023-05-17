@@ -13,31 +13,32 @@ from pydantic import BaseModel, validator
         
 class ChatBase(ORJSONModel):
     title: Optional[str]
-    participants: List[User] = []
     is_direct: bool = False
     photo: str = ""
     created_at: Optional[datetime]
     updated_at: Optional[datetime]
     
 class ChatCreate(ChatBase):
-    @classmethod 
-    def __get_validators__(cls): 
-        yield cls._validate_from_json_string 
+    participants: List[User] = []
     
-    @classmethod 
-    def _validate_from_json_string(cls, value): 
-        if isinstance(value, str): 
-            return cls.validate(json.loads(value.encode())) 
-        return cls.validate(value)
+    
+class ChatUpdate(ChatBase):
+    id: int
+    is_direct: bool
     
 class Chat(ChatBase, metaclass=AllOptional):
     id: int
     is_direct: bool
+    participants: List[User] = []
     moderators: List[User] = []
 
     class Config:
         orm_mode = True
-
+        
+class ChatResponseItem(Chat):
+    participants: List[UserEmbedded]
+    moderators: List[UserEmbedded]
+        
     @validator('photo', pre=True)
     def photo_formater(cls, v, values) -> str:
         if values.get("photo") and not "http" in values.get("photo", ""):
@@ -47,16 +48,16 @@ class Chat(ChatBase, metaclass=AllOptional):
         else:
             photo = v
         return photo
-        
+    
         
 class ChatResponse(BaseModel):
     status: bool
-    chat: Chat
+    chat: ChatResponseItem
     
 
 class ChatListResponse(BaseModel):
     status: bool
-    chats: List[Chat]
+    chats: List[ChatResponseItem]
 
 class MessageBase(BaseModel):
     user: UserEmbedded
@@ -90,5 +91,5 @@ class WsData(BaseModel):
     
 class ChatDetailResponse(BaseModel):
     status: bool
-    chat: Chat
+    chat: ChatResponseItem
     messages: List[MessageResponse]

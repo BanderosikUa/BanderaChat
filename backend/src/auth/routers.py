@@ -38,13 +38,13 @@ async def register_user(
     
     user = await crud.create_user(db, auth_data)
     return {
-        "status": "success",
+        "status": True,
         "user": user,
     }
 
 @router.get('/me')
 async def get_me(user: User = Depends(required_user)) -> UserResponse:
-    return {"status": "success", "user": user}
+    return {"status": True, "user": user}
 
 @router.get("/users")
 async def get_all_users(pagination: PaginationParams = Depends(),
@@ -52,7 +52,7 @@ async def get_all_users(pagination: PaginationParams = Depends(),
                         db: Session = Depends(get_db)) -> UserResponseList:
     users = await crud.get_all_users(db, pagination, user)
     
-    return {"status": "success", "users": users}
+    return {"status": True, "users": users}
     
     
 
@@ -82,7 +82,7 @@ async def login(payload: UserLogin, response: Response,
                         ACCESS_TOKEN_EXPIRES_IN * 60, '/', None, False, False, 'lax')
 
     return AccessTokenResponse(
-        status="success", access_token=access_token
+        status=True, access_token=access_token
     )
 
 
@@ -120,4 +120,4 @@ def logout(response: Response, Authorize: AuthJWT = Depends(),
     Authorize.unset_jwt_cookies()
     response.set_cookie('logged_in', '', -1)
 
-    return {'status': 'success'}
+    return {'status': True}

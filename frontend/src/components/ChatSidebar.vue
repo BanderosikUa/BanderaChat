@@ -8,7 +8,7 @@
                         <button @click="createChatGroup" class="btn btn-light" id="Tooltip-Add-Group">
                             <i class='bx bxs-group'></i>
                         </button>
-                        <chat-create-popup ref="chatCreatePopup"></chat-create-popup>
+                        <chat-create-popup ref="chatCreatePopup" @create="addChat"></chat-create-popup>
                         <!-- <v-select :options="userList" label="name"></v-select> -->
                         <!-- <chat-create-popup ></chat-create-popup> -->
                     </div>
@@ -80,7 +80,7 @@ export default {
     },
     async created() {
         try {
-            const response = await axios.get('chats')
+            const response = await axios.get('chats?limit=100')
 
             console.log(response)
 
@@ -97,6 +97,10 @@ export default {
         createChatGroup() {
             this.$refs.chatCreatePopup.openDialog();
         },
+        addChat(chat) {
+            console.log(chat)
+            this.chats.push(chat)
+        }
     },
 }
 
@@ -159,9 +163,13 @@ ul {
     margin-top: 0;
 }
 
-.ps {
-    height: 95vh;
+.sidebar-body{
+    height: 75vh;
 }
+
+/* .ps {
+    height: 95vh;
+} */
 
 
 .sidebar-group .sidebar .list-group-item {

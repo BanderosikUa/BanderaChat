@@ -1,4 +1,4 @@
-from uuid import uuid4
+from secrets import token_hex
 
 from fastapi import UploadFile
 
@@ -33,8 +33,8 @@ def setup_message_type(user: auth_schemas.User,
             message.type = "other"
     return messages
 
-def upload_photo(photo: UploadFile) -> str:
-    filename = f"{uuid4()}.jpg"
+def save_photo(photo: UploadFile) -> str:
+    filename = f"{token_hex(10)}.jpg"
     photo.filename = filename
     
     blob = bucket.blob(filename)

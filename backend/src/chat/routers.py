@@ -1,4 +1,3 @@
-
 from fastapi import (
     APIRouter, WebSocket, WebSocketDisconnect,
     Depends, UploadFile, File, Body)
@@ -14,7 +13,7 @@ from src.auth.schemas import User
 
 from src.chat.manager import manager
 # from src.chat. import Chat
-from src.chat import crud, schemas, services
+from src.chat import crud, schemas, services, exceptions
 from src.chat.dependencies import (
     valid_chat, websocket_valid_chat, chat_data_checker
 )
@@ -63,17 +62,32 @@ async def websocket_endpoint(websocket: WebSocket,
         
 
 @router.post("/chats")
-async def create_chat(chat_data: schemas.ChatCreate = Body(...),
-                      photo: UploadFile | None = File(None),
+async def create_chat(chat_data: schemas.ChatCreate,
                       user: User = Depends(required_user),
                       db: Session = Depends(get_db)) -> schemas.ChatResponse:
-    if photo:
-        photo = services.upload_photo(photo)
-        chat_data.photo = photo
-        
     chat = await crud.create_chat(db, chat_data, user)
     
     return {'status': True, 'chat': chat}
+
+@router.post("/chats/{chat_id}/upload")
+async def upload_photo_to_chat(chat: schemas.Chat = Depends(valid_chat),
+                               photo: UploadFile = File(...),
+                               user: User = Depends(required_user),
+                               db: Session = Depends(get_db)) -> schemas.ChatResponse:
+    chat = schemas.ChatUpdate(**(chat.dict()))
+    extension = photo.filename.split(".")[-1]
+    
+    if extension not in ["jpg", "jpeg", "png"]:
+        raise exceptions.PhotoExtensionNotAlllow()
+    
+    filename = services.save_photo(photo)
+    chat.photo = filename
+    
+    chat = await crud.update_chat(db, chat)
+    
+    return {"status": True, "chat": chat}
+    
+
     
 @router.get("/chats")
 async def get_users_chats(pagination: PaginationParams = Depends(),

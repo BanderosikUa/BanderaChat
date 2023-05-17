@@ -28,8 +28,7 @@ class TestAuthRouters:
         resp_json = resp.json()
 
         assert resp.status_code == status.HTTP_201_CREATED
-        assert resp_json['status'] == "success"
-
+        assert resp_json['status'] == True
     async def test_register_email_taken(self, client: TestClient, db: Session) -> None:
         user_1 = UserCreate(username='test1', email='test1@world.com',
                             password="!Qwerty123")

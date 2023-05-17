@@ -10,6 +10,10 @@ class ChatNotFound(NotFound):
 
 class DirectChatAlreadyExists(BadRequest):
     DETAIL = ErrorCode.ChatAlreadyExists
+
+class PhotoExtensionNotAlllow(BadRequest):
+    DETAIL = ErrorCode.PhotoExtensionNotAlllow
+
     
 class ChatUserNotExists(CustomValidationError):
     FIELD = "participants"

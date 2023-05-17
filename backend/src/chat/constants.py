@@ -14,3 +14,4 @@ class ErrorCode:
     ChatAlreadyExists="This direct chat already exists"
     ListOfTwoObjs="Must be a list of 2 objects"
     ChatUserNotExists="User not exists"
+    PhotoExtensionNotAlllow="Photo file extension not allowed"

@@ -1,3 +1,4 @@
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
 from src.schemas import PaginationParams
@@ -7,7 +8,7 @@ from src.auth.crud import get_user_by_id, get_users_list_by_ids
 from src.auth.models import User
 from src.auth.schemas import User as UserSchema
 
-from src.chat.schemas import MessageCreate, ChatCreate
+from src.chat.schemas import MessageCreate, ChatCreate, ChatUpdate
 from src.chat.models import Chat, Message
 from src.chat.exceptions import DirectChatAlreadyExists, DirectParticipantListMustHave2Objs, ChatUserNotExists
 
@@ -61,6 +62,21 @@ async def create_chat(db: Session, chat: ChatCreate, user: UserSchema) -> Chat:
     db.refresh(db_chat)
     
     return db_chat
+
+async def update_chat(db: Session, chat: ChatUpdate) -> Chat:
+    updated_data = chat.dict(exclude_unset=True)
+    
+    chat_db = db.query(Chat).filter(Chat.id == chat.id).first()
+    chat_data = jsonable_encoder(chat_db)
+    
+    for field in chat_data:
+        if field in updated_data:
+            setattr(chat_db, field, updated_data[field])
+    
+    db.commit()
+    db.refresh(chat_db)
+    
+    return chat_db
 
 async def get_direct_chat_by_particips(db: Session, participants: list[User]) -> Chat:
     if len(participants) != 2:

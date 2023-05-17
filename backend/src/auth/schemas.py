@@ -97,15 +97,15 @@ class UserEmbedded(UserBase):
         return photo
 
 class UserResponse(ORJSONModel):
-    status: str
+    status: bool
     user: UserResponseSchema
     
     
 class UserResponseList(ORJSONModel):
-    status: str
+    status: bool
     users: list[UserEmbedded]
     
         
 class AccessTokenResponse(ORJSONModel):
-    status: str
+    status: bool
     access_token: str
