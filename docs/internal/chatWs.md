@@ -44,3 +44,17 @@ data:
 - action
 - user
 - message
+- 
+### Send ping(on send)
+Send ping to handle ws open.
+
+action - 'ping'
+
+data:
+- action
+
+### Receive pong(on receive)
+Receive pong from ws server that connection are alive
+
+data:
+- action("pong")

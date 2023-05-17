@@ -36,34 +36,30 @@ async def websocket_endpoint(websocket: WebSocket,
 
     This endpoint will accept incoming WebSocket connections and will send
     a message to the client every second.
+    
+    Connection accept inside websocket_required_user dependencies
     """
+    data = {"user": user}
+    
+    await manager.on_online(ws=websocket, db=db, data=data)
     try:
+        
         while True:
             data = await websocket.receive_json()
-            data['user'] = User
+            data["user"] = user
+            data["chat"] = chat
             
-            # move db session in manager
-            message = schemas.MessageCreate(
-                user=user, chat=chat, message=data['message'],
-                )
-            message = await crud.create_message(db, message)
-            message = schemas.MessageResponse.from_orm(message)
-            message.type = "other"
-            
-            data['message'] = message
-            
-            data = schemas.WsData(action=data['action'],
-                                  user=user,
-                                  message=message)
             LOGGER.info(data)
             
-            await manager.on_receive(websocket, data)
+            await manager.on_receive(ws=websocket, data=data, db=db)
     except WebSocketDisconnect as err:
         LOGGER.info(err)
         LOGGER.info(f"{user.id} disconnected in {chat.id} chat")
         await manager.disconnect(websocket)
     except Exception as e:
         LOGGER.info(str(e))
+        data["error"] = str(e)[:50]
+        await manager.on_error(ws=websocket, data=data, db=db)
         
 
 @router.post("/chats")
