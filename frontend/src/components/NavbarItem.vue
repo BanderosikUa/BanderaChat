@@ -26,9 +26,10 @@
                 </a>
             </li>
             <li class="nav-link brackets">
-                <a href="#">
+                <button @click="changeProfilePopup" id="Tooltip-Add-Group">
                     <i class='bx bx-pencil icon'></i>
-                </a>
+                </button>
+                <profile-dialog ref="profileChangePopup"></profile-dialog>
             </li>
             <li class="nav-link">
                 <a href="#">
@@ -117,21 +118,29 @@ body{
 
 <script>
 import axios from 'axios'
+import ProfileDialog from './ProfileDialog.vue'
 
 export default{
+    components:{
+        ProfileDialog,
+    },
     methods: {
         async logout(){
             try{
                 const response = await axios.get('auth/logout')
                 console.log(response.data)
-                if (response.data.status == "success"){
+                if (response.data.status === true){
                     localStorage.removeItem("access_token");
                     this.$router.push('login')}
             } catch(e){
                 console.log(e)
                 if (e.response.status == 401){this.$router.push('login')}
             }
-        }
+        },
+        changeProfilePopup() {
+            this.$refs.profileChangePopup.openDialog();
+        },
+        
     }
 }
 </script>

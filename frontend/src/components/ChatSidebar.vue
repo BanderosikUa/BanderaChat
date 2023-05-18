@@ -65,13 +65,15 @@
 <script>
 import axios from 'axios'
 import ChatCreatePopup from './ChatCreatePopup.vue'
+import ProfileDialog from './ProfileDialog.vue'
 // import Swal from 'sweetalert2';
 import vSelect from 'vue-select'
 
 export default {
     components:{
         ChatCreatePopup,
-        vSelect
+        vSelect,
+        ProfileDialog
     },
     data() {
         return {

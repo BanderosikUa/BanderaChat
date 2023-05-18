@@ -19,6 +19,7 @@ class WebSocketManager:
 
     async def connect(self, ws: WebSocket) -> None:
         await ws.accept()
+        LOGGER.info(self.connections)
         await self.add_connection(ws)
 
     async def disconnect(self, ws: WebSocket) -> None:

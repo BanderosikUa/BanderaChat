@@ -13,7 +13,11 @@ STRONG_PASSWORD_PATTERN = re.compile(r"^(?=.*[\d])(?=.*[!@#$%^&*])[\w!@#$%^&*]{6
 
 class UserBase(ORJSONModel):
     username: Optional[str]
-    photo: Optional[str] = ""
+    
+# class UserUpdate(UserBase):
+#     id: Optional[int]
+#     email: Optional[EmailStr]
+    
 
 class UserRegister(UserBase):
     username: str = Field(max_length=128, min_length=3)
@@ -58,11 +62,18 @@ class UserLogin(ORJSONModel):
         return values
     
 class User(UserBase):
-    id: int
+    id: Optional[int]
     email: Optional[EmailStr]
+    photo: str = ""
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
     verified: Optional[bool] = False
+    
+    class Config:
+        orm_mode = True
+
+class UserResponseSchema(User):
+    id: int
     
     @validator('photo', pre=True)
     def photo_formater(cls, v, values) -> str:
@@ -74,14 +85,9 @@ class User(UserBase):
             photo = v
         return photo
     
-    class Config:
-        orm_mode = True
-
-class UserResponseSchema(User):
-    id: int
-    
 class UserEmbedded(UserBase):
     id: int
+    photo: str = ""
     
     class Config:
         orm_mode = True

@@ -71,7 +71,7 @@ async def websocket_required_user(websocket: WebSocket,
     except AuthJWTException as err:
         LOGGER.error(err.message)
         data = {"error": err.message}
-        await manager.on_error(ws=websocket, db=db, dict=data)
+        await manager.on_error(ws=websocket, db=db, data=data)
     
     except WebSocketDisconnect as err:
         LOGGER.info(err)

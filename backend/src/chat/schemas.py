@@ -19,7 +19,7 @@ class ChatBase(ORJSONModel):
     updated_at: Optional[datetime]
     
 class ChatCreate(ChatBase):
-    participants: List[User] = []
+    participants: List[User]
     
     
 class ChatUpdate(ChatBase):

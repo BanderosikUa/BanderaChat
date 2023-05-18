@@ -6,6 +6,7 @@ import 'vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css'
 import 'sweetalert2/dist/sweetalert2.min.css';
 import 'bootstrap/dist/css/bootstrap.css';
 import "bootstrap";
+import '@mdi/font/css/materialdesignicons.css';
 import './interceptors/axios'
 
 import App from './App.vue';
