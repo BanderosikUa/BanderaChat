@@ -120,12 +120,24 @@ export default {
     return {
       messages: [],
       chat: null,
+      user: null,
       newMessage: '',
       connection: null,
       isLoading: false,
     }
   },
   async created() {
+    await axios.get('auth/me').then(response => {
+      console.log(response.data)
+      if (response.data.status === true) {
+          this.user = response.data.user
+      }
+    }).catch(e => {
+        console.log(e)
+        alert(JSON.stringify(e.response.data.detail, null, 2))
+
+    })
+    
     this.$watch(
       () => this.$route.params,
       () => {
@@ -142,7 +154,7 @@ export default {
     async sendMessage() {
       if (this.newMessage.trim() !== '') {
         const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        this.messages.push({ message: this.newMessage, created_at: time, type: 'own' })
+        this.messages.push({ message: this.newMessage, created_at: time, type: 'own', user: this.user})
 
         const data = { action: "send_message", message: this.newMessage }
         this.connection.send(JSON.stringify(data));
@@ -190,7 +202,7 @@ export default {
       this.connection.onmessage = function (event) {
         let data = JSON.parse(event.data)
         if (data.action === "newMessage") {
-          vm.messages.push({ message: data.message.message, created_at: data.message.created_at, type: data.message.type })
+          vm.messages.push({ message: data.message.message, created_at: data.message.created_at, type: data.message.type, user: data.user })
         }
       }
 
