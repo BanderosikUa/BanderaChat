@@ -5,7 +5,7 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from sqlalchemy.orm import Session
 
 from src.config import LOGGER
-from src.chat.schemas import MessageCreate, WsData, User
+from src.chat.schemas import MessageCreate, WsData, User, UserEmbedded
 from src.chat.crud import create_message
 from src.chat import crud, schemas, services
 
@@ -63,6 +63,7 @@ class ConnectionManager(WebSocketManager):
     async def on_online(self, *, ws: WebSocket,
                         data: dict, db: Session = None) -> None:
         user = data['user']
+        user = UserEmbedded(**(user.dict()))
         await self.broadcast({'action': 'online', 
                               'user': json.loads(user.json())})
         
@@ -75,6 +76,8 @@ class ConnectionManager(WebSocketManager):
     async def join(self, *, ws: WebSocket,
                    data: dict, db: Session = None) -> None:
         user = data["user"]
+        user = UserEmbedded(**(user.dict()))
+        
         await self.broadcast({'action': 'join',
                               "user": json.loads(user.json()),
                               'message': f"{user.username} join the chat"})
@@ -82,6 +85,9 @@ class ConnectionManager(WebSocketManager):
     async def close(self, *, ws: WebSocket,
                     data: dict, db: Session = None) -> None:
         user = data["user"]
+        
+        user = UserEmbedded(**(user.dict()))
+        
         await self.broadcast_exclude(
             [ws],
             {'action': 'disconnect', 
@@ -101,6 +107,8 @@ class ConnectionManager(WebSocketManager):
         message = await crud.create_message(db, message)
         message = schemas.MessageResponse.from_orm(message)
         message.type = "other"
+        
+        user = UserEmbedded(**(user.dict()))
         
         await self.broadcast_exclude([ws], {
             'action': 'newMessage',

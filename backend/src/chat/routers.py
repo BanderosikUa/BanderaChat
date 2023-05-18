@@ -51,8 +51,8 @@ async def websocket_endpoint(websocket: WebSocket,
             LOGGER.info(data)
             
             await manager.on_receive(ws=websocket, data=data, db=db)
-    except WebSocketDisconnect as err:
-        LOGGER.info(err)
+    except WebSocketDisconnect as e:
+        LOGGER.info(str(e))
         LOGGER.info(f"{user.id} disconnected in {chat.id} chat")
         await manager.disconnect(websocket)
     except Exception as e:
