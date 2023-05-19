@@ -8,15 +8,16 @@ from src.database import get_db
 from src.schemas import PaginationParams
 from src.config import LOGGER
 
-from src.auth.dependencies import required_user, websocket_required_user
-from src.auth.schemas import User
-
-from src.chat.manager import manager
-# from src.chat. import Chat
 from src.chat import crud, schemas, services, exceptions
 from src.chat.dependencies import (
-    valid_chat, websocket_valid_chat, chat_data_checker
+    valid_chat, websocket_valid_chat
 )
+from src.chat.manager import manager
+
+from src.auth.dependencies import required_user, websocket_required_user
+from src.user.schemas import User
+
+
 router = APIRouter()
 
 

@@ -4,13 +4,14 @@ from sqlalchemy.orm import Session
 from src.schemas import PaginationParams
 from src.config import LOGGER
 
-from src.auth.crud import get_user_by_id, get_users_list_by_ids
-from src.auth.models import User
-from src.auth.schemas import User as UserSchema
-
 from src.chat.schemas import MessageCreate, ChatCreate, ChatUpdate
 from src.chat.models import Chat, Message
 from src.chat.exceptions import DirectChatAlreadyExists, DirectParticipantListMustHave2Objs, ChatUserNotExists
+
+from src.user.crud import get_user_by_id, get_users_list_by_ids
+from src.user.models import User
+from src.user.schemas import User as UserSchema
+
 
 
 async def get_chat_by_id(db: Session, chat_id: int) -> Chat | None:

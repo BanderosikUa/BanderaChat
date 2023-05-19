@@ -6,7 +6,7 @@ from typing import List, Optional
 from src.config import bucket
 from src.schemas import AllOptional, ORJSONModel
 
-from src.auth.schemas import User, UserEmbedded
+from src.user.schemas import User, UserEmbedded
 
 from pydantic import BaseModel, validator
 

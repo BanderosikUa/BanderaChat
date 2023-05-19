@@ -8,13 +8,14 @@ from sqlalchemy.orm import Session
 from src.database import get_db
 from src.config import LOGGER
 
-from src.auth.dependencies import websocket_required_user, required_user
-from src.auth.schemas import User
-from src.auth.crud import get_user_by_id
-
 from src.chat.crud import get_chat_by_id
 from src.chat.schemas import Chat, ChatCreate
 from src.chat.exceptions import ChatPermissionRequired, ChatNotFound
+
+from src.auth.dependencies import websocket_required_user, required_user
+
+from src.user.schemas import User
+
 
 async def websocket_valid_chat(chat_id: int, 
                                user: User = Depends(websocket_required_user),

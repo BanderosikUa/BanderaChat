@@ -10,20 +10,23 @@ from fastapi import (
 from sqlalchemy.orm import Session
 
 from src.config import LOGGER
-
 from src.database import get_db
-from src.auth import crud, exceptions
-from src.auth.schemas import User
 
+from src.auth import crud, exceptions
 from src.auth.models import RefreshToken
 
+
+from src.user.schemas import User
 from src.chat.manager import manager
+
 
 def _is_valid_refresh_token(db_refresh_token: RefreshToken) -> bool:
     return datetime.utcnow() <= db_refresh_token.expires_at
 
 async def required_user(Authorize: AuthJWT = Depends(),
                         db: Session = Depends(get_db)) -> User:
+    """Check if user logined and return User schema or raise error"""
+    
     try:
         Authorize.jwt_required()
         user_id = Authorize.get_jwt_subject()

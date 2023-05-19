@@ -101,7 +101,8 @@
       </div>
     </div>
     <div class="chat" v-else>
-      Loading
+      <span v-if="isLostWs">WebSocket connection lost, please reload a page!</span>
+      <span v-else>Loading</span>
     </div>
   </div>
 </template>
@@ -124,6 +125,7 @@ export default {
       newMessage: '',
       connection: null,
       isLoading: false,
+      isLostWs: false,
     }
   },
   async created() {
@@ -214,6 +216,8 @@ export default {
       this.connection.onclose = function (event) {
         console.log(event)
         console.log("Disconneted from websocket server")
+        this.isLoading = true;
+        this.isLostWs = true;
         clearInterval(pingInterval);
       }
     },
@@ -306,4 +310,6 @@ export default {
   flex-direction: column;
   align-items: flex-start;
 }
+
+
 </style>

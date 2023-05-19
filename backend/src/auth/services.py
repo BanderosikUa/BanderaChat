@@ -1,15 +1,11 @@
-import random
-import string
-
 from sqlalchemy.orm import Session
 
-from src.config import LOGGER, bucket
-
-from src.auth.models import User
 from src.auth.exceptions import InvalidCredentials
-from src.auth.schemas import UserLogin, UserRegister
+from src.auth.schemas import UserLogin
 from src.auth.security import check_password
-from src.auth.crud import get_user_by_username, get_user_by_email
+
+from src.user.crud import get_user_by_username, get_user_by_email
+from src.user.models import User
 
 
 async def authenticate_user(db: Session, auth_data: UserLogin) -> User:

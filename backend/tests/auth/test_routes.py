@@ -10,7 +10,7 @@ from fastapi import status
 from src.config import LOGGER
 from src.auth.constants import ErrorCode
 from src.auth.crud import create_user
-from src.auth.schemas import UserCreate
+from src.auth.schemas import UserRegister
 
 @pytest.mark.asyncio
 class TestAuthRouters:
@@ -29,9 +29,10 @@ class TestAuthRouters:
 
         assert resp.status_code == status.HTTP_201_CREATED
         assert resp_json['status'] == True
+        
     async def test_register_email_taken(self, client: TestClient, db: Session) -> None:
-        user_1 = UserCreate(username='test1', email='test1@world.com',
-                            password="!Qwerty123")
+        user_1 = UserRegister(username='test1', email='test1@world.com',
+                              password="!Qwerty123")
         user = await create_user(db, user_1)
         resp = await client.post(
             "/auth/register",
@@ -48,8 +49,8 @@ class TestAuthRouters:
         assert resp_json['detail'][0]['email'] == ErrorCode.EMAIL_TAKEN
         
     async def test_register_username_taken(self, client: TestClient, db: Session) -> None:
-        user_1 = UserCreate(username='test1', email='test1@world.com',
-                            password="@Test123", passwordConfirm="@Test123")
+        user_1 = UserRegister(username='test1', email='test1@world.com',
+                              password="@Test123", passwordConfirm="@Test123")
         await create_user(db, user_1)
         resp = await client.post(
             "/auth/register",
