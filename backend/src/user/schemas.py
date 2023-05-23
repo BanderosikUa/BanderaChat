@@ -16,18 +16,7 @@ class UserBase(ORJSONModel):
 # class UserUpdate(UserBase):
 #     id: Optional[int]
 #     email: Optional[EmailStr]
-    email: Optional[EmailStr]
-    username: Optional[str] = Field(max_length=128, min_length=3)
-    password: constr(min_length=8)
-    
-    class Config:
-        validate_assignment = True
-        
-    @root_validator(pre=True)
-    def validate_is_email_or_username(cls, values): # better name needed ;) 
-        if sum([bool(v) for v in values.values()]) != 2:
-            raise ValueError('Either email or username must be set.')
-        return values
+
     
 class User(UserBase):
     id: Optional[int]
@@ -53,6 +42,7 @@ class UserResponseSchema(User):
             photo = v
         return photo
     
+
 class UserEmbedded(UserBase):
     id: int
     photo: str = ""

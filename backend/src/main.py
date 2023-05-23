@@ -52,4 +52,4 @@ async def validation_exception_handler(request, exc: RequestValidationError|Cust
 
 app.include_router(auth_router, prefix="/auth", tags=["Auth"])
 app.include_router(chat_router, tags=["Chat"])
-app.include_router(user_router, tags=["User"])
+app.include_router(user_router, prefix="/users", tags=["User"])

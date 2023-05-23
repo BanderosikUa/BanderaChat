@@ -12,9 +12,11 @@ from src.auth.dependencies import required_user
 from src.chat.services import save_photo
 
 from src.user import crud, exceptions
+from src.user.models import User
 from src.user.schemas import (
-    User, UserResponse,
-    UserResponseList)
+    UserResponse,
+    UserResponseList,
+    User as UserSchema)
 
 
 router = APIRouter()
@@ -26,7 +28,7 @@ async def get_me(user: User = Depends(required_user)) -> UserResponse:
 
 
 @router.patch("/me")
-async def update_user(payload: User,
+async def update_user(payload: UserSchema,
                       user: User = Depends(required_user),
                       db: Session = Depends(get_db)) -> UserResponse:
     payload.id = user.id
@@ -51,12 +53,18 @@ async def update_user(photo: UploadFile = File(...),
     
     return {"status": True, "user": user}
 
-
-
-@router.get("/users")
+@router.get("")
 async def get_all_users(pagination: PaginationParams = Depends(),
                         user = Depends(required_user),
                         db: Session = Depends(get_db)) -> UserResponseList:
+    users = await crud.get_all_users(db, pagination, user)
+    
+    return {"status": True, "users": users}
+
+@router.get("/me/friends")
+async def get_user_friends(pagination: PaginationParams = Depends(),
+                           user = Depends(required_user),
+                           db: Session = Depends(get_db)) -> UserResponseList:
     users = await crud.get_all_users(db, pagination, user)
     
     return {"status": True, "users": users}

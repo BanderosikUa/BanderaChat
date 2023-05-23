@@ -34,12 +34,22 @@ async def get_users_list_by_ids(db: Session, user_ids: list[int]) -> list[User]:
 
     return select_query.all()
 
-async def get_all_users(db: Session, pagination: PaginationParams, user: User) -> list[User]:
+async def get_all_users(db: Session, pagination: PaginationParams,
+                        user: User) -> list[User]:
     select_query = db.query(User).filter(User.id != user.id)
     select_query = select_query.offset(pagination.skip)
     select_query= select_query.limit(pagination.limit)
 
     return select_query.all()
+
+async def get_user_friends(db: Session, pagination: PaginationParams,
+                           user: User) -> list[User]:
+    select_query = db.query(User).filter(User.id != user.id)
+    select_query = select_query.offset(pagination.skip)
+    select_query= select_query.limit(pagination.limit)
+
+    return select_query.all()
+    
 
 async def get_user_by_email(db: Session, email: str) -> User | None:
     select_query = db.query(User).filter(User.email == email)

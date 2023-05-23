@@ -6,11 +6,11 @@ from pydantic import EmailStr, Field, validator, constr, root_validator
 from src.schemas import ORJSONModel
 
 from src.auth.constants import ErrorCode
-from src.user.schemas import UserBase
+from src.user.schemas import User
 
 STRONG_PASSWORD_PATTERN = re.compile(r"^(?=.*[\d])(?=.*[!@#$%^&*])[\w!@#$%^&*]{6,128}$")
 
-class UserRegister(UserBase):
+class UserRegister(User):
     username: str = Field(max_length=128, min_length=3)
     email: EmailStr
     password: constr(min_length=8)
