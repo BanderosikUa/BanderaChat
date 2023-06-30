@@ -12,7 +12,7 @@ docker push -a banderosik/banderachat-backend
 
 Restart deployment pods
 ```
-kubectl rollout restart deployment webregi-v2-app 
+kubectl rollout restart deployment backend
 ```
 
 Run alembic migration job if needs

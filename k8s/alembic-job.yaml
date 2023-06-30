@@ -12,15 +12,30 @@ spec:
           args: ["alembic upgrade head"]
           env:
           - name: DATABASE_HOST
-            value: mysql-service
+            valueFrom:
+              secretKeyRef:
+                name: banderachat-secrets
+                key: DATABASE_HOST
           - name: DATABASE_USERNAME
-            value: root
+            valueFrom:
+              secretKeyRef:
+                name: banderachat-secrets
+                key: DATABASE_USERNAME
           - name: DATABASE_PASSWORD
-            value: admin
+            valueFrom:
+              secretKeyRef:
+                name: banderachat-secrets
+                key: DATABASE_PASSWORD
           - name: DATABASE
-            value: db
+            valueFrom:
+              secretKeyRef:
+                name: banderachat-secrets
+                key: DATABASE
           - name: DATABASE_SOCKET
-            value: "3306"
+            valueFrom:
+              secretKeyRef:
+                name: banderachat-secrets
+                key: DATABASE_SOCKET
       restartPolicy: Never
   backoffLimit: 5
   ttlSecondsAfterFinished: 100
