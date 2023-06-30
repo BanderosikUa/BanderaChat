@@ -2,12 +2,13 @@ import json
 
 import fastapi.openapi.utils as fu
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError, ValidationError, HTTPException
 
 from starlette.responses import JSONResponse
 
-from src.config import app_configs, settings, LOGGER
+from src.config import app_configs, settings, LOGGER, MEDIA_DIR
 from src.exceptions import CustomValidationError
 from src.schemas import ErrorResponse
 
@@ -53,3 +54,4 @@ async def validation_exception_handler(request, exc: RequestValidationError|Cust
 app.include_router(auth_router, prefix="/auth", tags=["Auth"])
 app.include_router(chat_router, tags=["Chat"])
 app.include_router(user_router, prefix="/users", tags=["User"])
+app.mount("/media", StaticFiles(directory=MEDIA_DIR.as_posix()), name="media")

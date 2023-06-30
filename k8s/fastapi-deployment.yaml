@@ -1,19 +1,37 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: images-volume
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+
+
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: webregi-v2-app
+  name: backend
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: webregi-v2-app
+      app: backend
   template:
     metadata:
       labels:
-        app: webregi-v2-app
+        app: backend
     spec:
+      volumes:
+        - name: images-volume
+          persistentVolumeClaim:
+            claimName: images-volume
       containers:
-      - name: webregi-v2-app
+      - name: backend
         image: banderosik/banderachat-backend:latest
         imagePullPolicy: Always
         ports:
@@ -54,26 +72,38 @@ spec:
         #     secretKeyRef:
         #       name: banderachat-secrets
         #       key: DATABASE_SOCKET
-        resources:
-            limits:
-              cpu: 256m
-              memory: 256Mi
-            requests:
-              cpu: 100m
-              memory: 128Mi
----
+        volumeMounts:
+          - name: images-volume
+            mountPath: /app/media
 ---
 
 apiVersion: v1
 kind: Service
 metadata:
-  name: webregi-v2-service
+  name: backend
 spec:
-  # replicas: 1
-  type: NodePort
+  type: ClusterIP
   ports:
-    - protocol: TCP
+    - name: "backend"
       port: 8000
-      targetPort: 8000
   selector:
-    app: webregi-v2-app
+    app: backend
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: backend
+  annotations:
+    dev.okteto.com/generate-host: backend
+spec:
+  rules:
+    - http:
+        paths:
+          - backend:
+              service:
+                name: backend
+                port:
+                  number: 8000
+            path: /
+            pathType: ImplementationSpecific

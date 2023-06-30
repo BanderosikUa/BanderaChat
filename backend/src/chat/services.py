@@ -2,7 +2,7 @@ from secrets import token_hex
 
 from fastapi import UploadFile
 
-from src.config import LOGGER, bucket
+from src.config import LOGGER, settings, MEDIA_DIR, bucket
 
 from src.chat.schemas import Chat as ChatSchema, MessageResponse
 from src.user.schemas import User as UserSchema
@@ -23,6 +23,7 @@ def setup_default_chat_photo_and_title(user: UserSchema,
             chat.title = interlocutor.username if interlocutor else chat.name
     return chats
 
+
 def setup_message_type(user: UserSchema,
                        messages: list[Message]) -> list[MessageResponse]:
     messages = [MessageResponse.from_orm(message_db) for message_db in messages]
@@ -33,11 +34,22 @@ def setup_message_type(user: UserSchema,
             message.type = "other"
     return messages
 
-def save_photo(photo: UploadFile) -> str:
+
+def save_photo_to_google_bucket(photo: UploadFile) -> str:
     filename = f"{token_hex(10)}.jpg"
     photo.filename = filename
     
     blob = bucket.blob(filename)
     blob.upload_from_file(photo.file)
+    return filename
+
+
+def save_photo_locally(photo: UploadFile) -> str:
+    contents = photo.read()
+    filename = f"{token_hex(10)}.jpg"
+    photo.filename = filename
+    filepath = settings.MEDIA_DIR / filename
+    filepath.write_bytes(contents)
+    
     return filename
     

@@ -7,7 +7,7 @@ spec:
     spec:
       containers:
         - name: webregi-v2-app
-          image: banderosik/banderachat-backend:v1.1
+          image: banderosik/banderachat-backend:latest
           command: ["/bin/sh","-c"]
           args: ["alembic upgrade head"]
           env:
@@ -23,3 +23,4 @@ spec:
             value: "3306"
       restartPolicy: Never
   backoffLimit: 5
+  ttlSecondsAfterFinished: 100

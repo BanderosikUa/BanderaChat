@@ -3,12 +3,11 @@ FROM python:3.11-alpine3.16
 RUN mkdir app
 WORKDIR /app
 
-RUN apk add build-deps \
+RUN apk add --no-cache \
     python3-dev \
     libpq \
     gcc g++ \
-    cargo \
-    && rm -rf /var/cache/apk/*
+    cargo
 
 
 ENV PATH="${PATH}:/root/.local/bin"

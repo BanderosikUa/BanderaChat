@@ -3,7 +3,7 @@ import json
 from datetime import datetime
 from typing import List, Optional
 
-from src.config import bucket
+from src.config import settings, bucket
 from src.schemas import AllOptional, ORJSONModel
 
 from src.user.schemas import User, UserEmbedded
@@ -38,16 +38,6 @@ class Chat(ChatBase, metaclass=AllOptional):
 class ChatResponseItem(Chat):
     participants: List[UserEmbedded]
     moderators: List[UserEmbedded]
-        
-    @validator('photo', pre=True)
-    def photo_formater(cls, v, values) -> str:
-        if values.get("photo") and not "http" in values.get("photo", ""):
-            photo = bucket.blob(values["photo"]).public_url
-        elif v and not "http" in v:
-            photo = bucket.blob(v).public_url
-        else:
-            photo = v
-        return photo
     
         
 class ChatResponse(BaseModel):

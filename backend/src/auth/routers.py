@@ -1,12 +1,14 @@
 from datetime import timedelta
 from fastapi import (
     APIRouter, Depends, status,
-    Response
+    Response, Request
 )
 
 from sqlalchemy.orm import Session
+
 from src.exceptions import DetailedBadRequest
 from src.database import get_db
+from src.config import MEDIA_DIR
 
 from src.auth import crud, exceptions
 from src.auth.schemas import (
@@ -28,6 +30,7 @@ REFRESH_TOKEN_EXPIRES_IN = auth_config.REFRESH_TOKEN_EXPIRES_IN
 
 @router.post("/register", status_code=status.HTTP_201_CREATED)
 async def register_user(
+    request: Request,
     auth_data: UserRegister,
     db: Session = Depends(get_db)
 ) -> UserResponse:
@@ -38,6 +41,7 @@ async def register_user(
         raise exceptions.UsernameTaken()
     
     user = await crud.create_user(db, auth_data)
+    user.photo = request.url.replace(path=MEDIA_DIR.joinpath(user.photo).as_posix())._url
     return {
         "status": True,
         "user": user,

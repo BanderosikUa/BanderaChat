@@ -1,9 +1,8 @@
-version: '3.8'
-
 services:
 
   backend:
     build: ./backend
+    dockerfile: ./backend/Dockerfile.prod
     ports:
       - 5000:5000
     volumes:
@@ -19,8 +18,8 @@ services:
       - DATABASE_SOCKET=3306
     depends_on:
       - mysql
-    networks:
-      - fastapinetwork
+      - frontend
+
   mysql:
     image: mysql:latest
     command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
@@ -29,23 +28,17 @@ services:
       - "3306:3306"
     environment:
       - MYSQL_ROOT_PASSWORD=admin
-      - MYSQL_DATABASE=db
+      # - MYSQL_DATABASE=db
     volumes:
       - ./entrypoints/mysql:/docker-entrypoint-initdb.d
-    networks:
-      - fastapinetwork
 
-  # frontend:
-  #   build: ./frontend
-  #   volumes:
-  #     - './:/app'
-  #     - '/app/node_modules'
-  #   ports:
-  #     - '8080:8080'
-  #   environment:
-  #     - CHOKIDAR_USEPOLLING=true
-    # command: "npm run serve -- --public 0.0.0.0:8080"
-  
-networks:
-    fastapinetwork:
-        driver: bridge
+  frontend:
+    build: ./frontend
+    dockerfile: ./frontend/Dockerfile
+    volumes:
+      - './:/app'
+      - '/app/node_modules'
+    ports:
+      - '80:80'
+    depends_on:
+      - backend

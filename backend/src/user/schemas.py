@@ -1,10 +1,12 @@
 import re
 from datetime import datetime
 from typing import Optional
+from fastapi.responses import FileResponse
+from fastapi import Request, Depends
 
 from pydantic import EmailStr, Field, validator, constr, root_validator
 
-from src.config import LOGGER, bucket
+from src.config import LOGGER, settings
 from src.schemas import AllOptional, ORJSONModel
 
 from src.auth.constants import ErrorCode
@@ -32,16 +34,6 @@ class User(UserBase):
 class UserResponseSchema(User):
     id: int
     
-    @validator('photo', pre=True)
-    def photo_formater(cls, v, values) -> str:
-        if values.get("photo") and not "http" in values.get("photo", ""):
-            photo = bucket.blob(values["photo"]).public_url
-        elif v and not "http" in v:
-            photo = bucket.blob(v).public_url
-        else:
-            photo = v
-        return photo
-    
 
 class UserEmbedded(UserBase):
     id: int
@@ -49,16 +41,6 @@ class UserEmbedded(UserBase):
     
     class Config:
         orm_mode = True
-        
-    @validator('photo', pre=True)
-    def photo_formater(cls, v, values) -> str:
-        if values.get("photo") and not "http" in values.get("photo", ""):
-            photo = bucket.blob(values["photo"]).public_url
-        elif v and not "http" in v:
-            photo = bucket.blob(v).public_url
-        else:
-            photo = v
-        return photo
 
 class UserResponse(ORJSONModel):
     status: bool

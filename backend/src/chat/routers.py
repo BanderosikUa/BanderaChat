@@ -1,12 +1,12 @@
 from fastapi import (
     APIRouter, WebSocket, WebSocketDisconnect,
-    Depends, UploadFile, File, Body)
+    Depends, UploadFile, File, Request)
 
 from sqlalchemy.orm import Session
 
 from src.database import get_db
 from src.schemas import PaginationParams
-from src.config import LOGGER
+from src.config import LOGGER, MEDIA_DIR
 
 from src.chat import crud, schemas, services, exceptions
 from src.chat.dependencies import (
@@ -21,10 +21,6 @@ from src.user.schemas import User
 router = APIRouter()
 
 
-@router.get("/chats/{chat_id}/access")
-async def websocket_access(chat: schemas.Chat = Depends(valid_chat),
-                           user: User = Depends(required_user)):
-    return {'status': True, "chat": chat.id, "user": user.id}
 
 @router.websocket("/chats/{chat_id}/ws")
 async def websocket_endpoint(websocket: WebSocket,
@@ -63,15 +59,18 @@ async def websocket_endpoint(websocket: WebSocket,
         
 
 @router.post("/chats")
-async def create_chat(chat_data: schemas.ChatCreate,
+async def create_chat(request: Request,
+                      chat_data: schemas.ChatCreate,
                       user: User = Depends(required_user),
                       db: Session = Depends(get_db)) -> schemas.ChatResponse:
     chat = await crud.create_chat(db, chat_data, user)
+    chat.photo = request.url.replace(path=MEDIA_DIR.joinpath(chat.photo).as_posix())._url
     
     return {'status': True, 'chat': chat}
 
 @router.post("/chats/{chat_id}/upload")
-async def upload_photo_to_chat(chat: schemas.Chat = Depends(valid_chat),
+async def upload_photo_to_chat(request: Request,
+                               chat: schemas.Chat = Depends(valid_chat),
                                photo: UploadFile = File(...),
                                user: User = Depends(required_user),
                                db: Session = Depends(get_db)) -> schemas.ChatResponse:
@@ -81,21 +80,25 @@ async def upload_photo_to_chat(chat: schemas.Chat = Depends(valid_chat),
     if extension not in ["jpg", "jpeg", "png"]:
         raise exceptions.PhotoExtensionNotAlllow()
     
-    filename = services.save_photo(photo)
+    filename = services.save_photo_to_google_bucket(photo)
     chat.photo = filename
     
     chat = await crud.update_chat(db, chat)
+    chat.photo = request.url.replace(path=MEDIA_DIR.joinpath(chat.photo).as_posix())._url
     
     return {"status": True, "chat": chat}
     
 
     
 @router.get("/chats")
-async def get_users_chats(pagination: PaginationParams = Depends(),
+async def get_users_chats(request: Request,
+                          pagination: PaginationParams = Depends(),
                           user: User = Depends(required_user),
                           db: Session = Depends(get_db)) -> schemas.ChatListResponse:
     chats = await crud.get_chats(db, pagination, user)
     chats = services.setup_default_chat_photo_and_title(user, chats)
+    chats = [request.url.replace(path=MEDIA_DIR.joinpath(chat.photo).as_posix())._url for chat in chats]
+    
     return {"status": True, "chats": chats}
 
 # @router.get("/chats/{chat_id}")
@@ -103,10 +106,13 @@ async def get_users_chats(pagination: PaginationParams = Depends(),
 #     return {"status": True, "chat": chat}
 
 @router.get("/chats/{chat_id}")
-async def get_chat_detail(chat = Depends(valid_chat),
+async def get_chat_detail(request: Request,
+                          chat = Depends(valid_chat),
                           user: User = Depends(required_user),
                           db: Session = Depends(get_db)) -> schemas.ChatDetailResponse:
     messages = await crud.get_messages_by_chat_id(db, chat_id=chat.id)
     messages = services.setup_message_type(user, messages)
     chat = services.setup_default_chat_photo_and_title(user, [chat])[0]
+    chat.photo = request.url.replace(path=MEDIA_DIR.joinpath(chat.photo).as_posix())._url
+    
     return {"status": True, "chat": chat, "messages": messages}
