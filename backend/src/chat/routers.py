@@ -80,7 +80,7 @@ async def upload_photo_to_chat(request: Request,
     if extension not in ["jpg", "jpeg", "png"]:
         raise exceptions.PhotoExtensionNotAlllow()
     
-    filename = services.save_photo_to_google_bucket(photo)
+    filename = services.save_photo_locally(photo)
     chat.photo = filename
     
     chat = await crud.update_chat(db, chat)

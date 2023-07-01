@@ -53,7 +53,7 @@ async def update_user(request: Request, photo: UploadFile = File(...),
     filename = save_photo_locally(photo)
     user.photo = filename
     
-    user = await crud.update_user(db, user)
+    user = await crud.update_user(db, UserSchema.from_orm(user))
     user.photo = request.url.replace(path=MEDIA_DIR.joinpath(user.photo).as_posix())._url
 
     return {"status": True, "user": user}

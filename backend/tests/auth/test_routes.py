@@ -12,6 +12,7 @@ from src.auth.constants import ErrorCode
 from src.auth.crud import create_user
 from src.auth.schemas import UserRegister
 
+
 @pytest.mark.asyncio
 class TestAuthRouters:
 

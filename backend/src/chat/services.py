@@ -1,3 +1,5 @@
+import shutil
+
 from secrets import token_hex
 
 from fastapi import UploadFile
@@ -45,11 +47,14 @@ def save_photo_to_google_bucket(photo: UploadFile) -> str:
 
 
 def save_photo_locally(photo: UploadFile) -> str:
-    contents = photo.read()
     filename = f"{token_hex(10)}.jpg"
     photo.filename = filename
-    filepath = settings.MEDIA_DIR / filename
-    filepath.write_bytes(contents)
+    filepath = MEDIA_DIR.joinpath(filename)
+    try:
+        with filepath.open("wb") as buffer:
+            shutil.copyfileobj(photo.file, buffer)
+    finally:
+        photo.file.close()
     
     return filename
     
