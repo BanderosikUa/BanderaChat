@@ -4,7 +4,7 @@ import uuid
 from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, DateTime, LargeBinary, Table
 from sqlalchemy.orm import relationship
 
-from src.database import Base, BinaryUUID
+from src.database import Base
 
 from src.chat.models import chat_participants, chat_moderators, users_read_messages
 

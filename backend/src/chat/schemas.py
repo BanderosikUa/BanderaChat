@@ -3,7 +3,7 @@ import json
 from datetime import datetime
 from typing import List, Optional
 
-from src.config import settings, bucket
+from src.config import settings
 from src.schemas import AllOptional, ORJSONModel
 
 from src.user.schemas import User, UserEmbedded

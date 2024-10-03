@@ -64,7 +64,6 @@ async def create_chat(request: Request,
                       user: User = Depends(required_user),
                       db: Session = Depends(get_db)) -> schemas.ChatResponse:
     chat = await crud.create_chat(db, chat_data, user)
-    chat.photo = request.url.replace(path=MEDIA_DIR.joinpath(chat.photo).as_posix())._url
     
     return {'status': True, 'chat': chat}
 
@@ -84,7 +83,6 @@ async def upload_photo_to_chat(request: Request,
     chat.photo = filename
     
     chat = await crud.update_chat(db, chat)
-    chat.photo = request.url.replace(path=MEDIA_DIR.joinpath(chat.photo).as_posix())._url
     
     return {"status": True, "chat": chat}
     
@@ -97,7 +95,6 @@ async def get_users_chats(request: Request,
                           db: Session = Depends(get_db)) -> schemas.ChatListResponse:
     chats = await crud.get_chats(db, pagination, user)
     chats = services.setup_default_chat_photo_and_title(user, chats)
-    chats = [request.url.replace(path=MEDIA_DIR.joinpath(chat.photo).as_posix())._url for chat in chats]
     
     return {"status": True, "chats": chats}
 
@@ -113,6 +110,5 @@ async def get_chat_detail(request: Request,
     messages = await crud.get_messages_by_chat_id(db, chat_id=chat.id)
     messages = services.setup_message_type(user, messages)
     chat = services.setup_default_chat_photo_and_title(user, [chat])[0]
-    chat.photo = request.url.replace(path=MEDIA_DIR.joinpath(chat.photo).as_posix())._url
     
     return {"status": True, "chat": chat, "messages": messages}

@@ -107,8 +107,7 @@ venv/
 env.bak/
 venv.bak/
 node_modules/
-.env
-env/
+# env/
 
 # Spyder project settings
 .spyderproject
@@ -139,6 +138,7 @@ staticfiles/
 logs
 **/migrations/**
 alembic/versions/**
+!alembic/versions/.keep
 !**/migrations/__init__.py
 __pycache__
 
@@ -149,3 +149,7 @@ templates/lands
 172
 docs/site
 media/*
+!media/default.png
+!media/default2.png
+!media/default3.png
+!media/default4.png

@@ -8,7 +8,6 @@ from fastapi.exceptions import RequestValidationError
 from pydantic import BaseModel
 
 
-
 class DetailedHTTPException(HTTPException):
     STATUS_CODE = status.HTTP_500_INTERNAL_SERVER_ERROR
     DETAIL = "Server error"

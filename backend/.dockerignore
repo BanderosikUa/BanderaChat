@@ -1,5 +1,5 @@
 venv/
 .pytest_cache
 logs/
-media/*
-media/!*default*
+# media/*
+# media/!*default*

@@ -4,7 +4,7 @@ from secrets import token_hex
 
 from fastapi import UploadFile
 
-from src.config import LOGGER, settings, MEDIA_DIR, bucket
+from src.config import LOGGER, settings, MEDIA_DIR
 
 from src.chat.schemas import Chat as ChatSchema, MessageResponse
 from src.user.schemas import User as UserSchema
@@ -37,13 +37,13 @@ def setup_message_type(user: UserSchema,
     return messages
 
 
-def save_photo_to_google_bucket(photo: UploadFile) -> str:
-    filename = f"{token_hex(10)}.jpg"
-    photo.filename = filename
+# def save_photo_to_google_bucket(photo: UploadFile) -> str:
+#     filename = f"{token_hex(10)}.jpg"
+#     photo.filename = filename
     
-    blob = bucket.blob(filename)
-    blob.upload_from_file(photo.file)
-    return filename
+#     blob = bucket.blob(filename)
+#     blob.upload_from_file(photo.file)
+#     return filename
 
 
 def save_photo_locally(photo: UploadFile) -> str:

@@ -41,7 +41,6 @@ async def register_user(
         raise exceptions.UsernameTaken()
     
     user = await crud.create_user(db, auth_data)
-    user.photo = request.url.replace(path=MEDIA_DIR.joinpath(user.photo).as_posix())._url
     return {
         "status": True,
         "user": user,

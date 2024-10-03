@@ -14,6 +14,7 @@ from src.database import DATABASE_URL
 # access to the values within the .ini file in use.
 import sys, os
 
+
 sys.path.append(os.getcwd())
 config = context.config
 

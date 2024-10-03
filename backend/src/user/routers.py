@@ -25,7 +25,6 @@ router = APIRouter()
 @router.get('/me')
 async def get_me(request: Request, 
                  user: User = Depends(required_user)) -> UserResponse:
-    user.photo = request.url.replace(path=MEDIA_DIR.joinpath(user.photo).as_posix())._url
     return {"status": True, "user": user}
 
 
@@ -36,7 +35,6 @@ async def update_user(request: Request, payload: UserSchema,
     payload.id = user.id
     
     user = await crud.update_user(db, payload)
-    user.photo = request.url.replace(path=MEDIA_DIR.joinpath(user.photo).as_posix())._url
 
     
     return {"status": True, "user": user}
@@ -54,7 +52,6 @@ async def update_user(request: Request, photo: UploadFile = File(...),
     user.photo = filename
     
     user = await crud.update_user(db, UserSchema.from_orm(user))
-    user.photo = request.url.replace(path=MEDIA_DIR.joinpath(user.photo).as_posix())._url
 
     return {"status": True, "user": user}
 
@@ -63,7 +60,6 @@ async def get_all_users(request: Request, pagination: PaginationParams = Depends
                         user = Depends(required_user),
                         db: Session = Depends(get_db)) -> UserResponseList:
     users = await crud.get_all_users(db, pagination, user)
-    users = [request.url.replace(path=MEDIA_DIR.joinpath(user.photo).as_posix())._url for user in users]
     
     return {"status": True, "users": users}
 
@@ -72,6 +68,5 @@ async def get_user_friends(request: Request, pagination: PaginationParams = Depe
                            user = Depends(required_user),
                            db: Session = Depends(get_db)) -> UserResponseList:
     users = await crud.get_all_users(db, pagination, user)
-    users = [request.url.replace(path=MEDIA_DIR.joinpath(user.photo).as_posix())._url for user in users]
 
     return {"status": True, "users": users}
