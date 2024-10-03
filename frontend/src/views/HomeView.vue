@@ -15,7 +15,7 @@ export default{
     },
     async created(){
         try{
-            const response = await axios.get('auth/me')
+            const response = await axios.get('users/me')
 
         this.user = response.data.user
         } catch(e){

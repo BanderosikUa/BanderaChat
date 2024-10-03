@@ -14,7 +14,7 @@
                         label="Photo" v-model="photo">
                         <template #prepend-inner>
                             <figure class="avatar avatar-state-success">
-                                <img :src="user.photo" class="rounded-circle" alt="avatar">
+                                <img :src="getImageUrl(user.photo)" class="rounded-circle" alt="avatar">
                             </figure>
                         </template>
 
@@ -31,6 +31,7 @@
   
 <script>
 import axios from 'axios'
+import { getImageUrl } from "./utils"
 
 export default {
     data() {
@@ -47,6 +48,7 @@ export default {
         };
     },
     methods: {
+        getImageUrl,
         async onSubmit() {
             if (!this.$refs.form.validate()) {
                 console.log('no validate')
@@ -54,7 +56,7 @@ export default {
             }
 
             const data = { username: this.username, email: this.email }
-            await axios.patch('auth/me', data).then(async response => {
+            await axios.patch('users/me', data).then(async response => {
                 console.log(response.data)
                 if (response.data.status === true) {
                     this.user = response.data.user
@@ -67,7 +69,7 @@ export default {
             if (this.photo !== null) {
                 const formData = new FormData();
                 formData.append('photo', this.photo[0]);
-                await axios.post(`auth/me/upload`, formData).then(response => {
+                await axios.post(`users/me/upload`, formData).then(response => {
                     console.log(response.data)
                     this.user = response.data.user
                 }).catch(e => {
@@ -88,7 +90,7 @@ export default {
         },
     },
     async created() {
-        await axios.get('auth/me').then(response => {
+        await axios.get('users/me').then(response => {
             console.log(response.data)
             if (response.data.status === true) {
                 this.user = response.data.user

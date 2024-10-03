@@ -129,7 +129,7 @@ export default {
     }
   },
   async created() {
-    await axios.get('auth/me').then(response => {
+    await axios.get('users/me').then(response => {
       console.log(response.data)
       if (response.data.status === true) {
           this.user = response.data.user

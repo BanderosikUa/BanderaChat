@@ -83,7 +83,7 @@ export default {
     },
   },
   async created() {
-    await axios.get('auth/users?limit=100').then(response => {
+    await axios.get('users?limit=100').then(response => {
       console.log(response.data)
       if (response.data.status === true) {
         this.users = response.data.users
