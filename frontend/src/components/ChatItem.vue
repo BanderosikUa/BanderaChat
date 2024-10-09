@@ -197,6 +197,7 @@ export default {
       url.searchParams.append('token', localStorage.getItem('access_token'))
 
       url.protocol = url.protocol.replace('http', 'ws');
+      console.log(url.href)
       this.connection = new WebSocket(url.href)
 
       // Send ping message periodically

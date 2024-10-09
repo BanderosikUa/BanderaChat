@@ -9,7 +9,7 @@
           <v-text-field v-model="groupName" label="Group name" :rules="rules"></v-text-field>
           <v-autocomplete v-model="selectedUsers" :items="users" label="Users" item-title="username" item-value="id"
             multiple chips :rules="[v => !!v || 'Item is required']" required></v-autocomplete>
-          <v-file-input accept="image/png, image/jpeg, image/png" placeholder="Pick an photo" label="Photo"
+          <v-file-input accept="image/png, image/jpeg, image/png, image/jpg" placeholder="Pick an photo" label="Photo"
             v-model="photo"></v-file-input>
           <v-card-actions class="justify-end">
             <v-btn color="purple" variant="elevated" @click="onSubmit">Create</v-btn>
