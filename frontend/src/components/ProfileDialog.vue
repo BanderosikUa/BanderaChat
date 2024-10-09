@@ -10,7 +10,7 @@
                     <v-text-field v-model="email" label="Email" :rules="rules"></v-text-field>
 
 
-                    <v-file-input prepend-icon="" accept="image/png, image/jpeg, image/png" placeholder="Pick a photo"
+                    <v-file-input prepend-icon="" accept="image/png, image/jpeg, image/png, image/jpg" placeholder="Pick a photo"
                         label="Photo" v-model="photo">
                         <template #prepend-inner>
                             <figure class="avatar avatar-state-success">
@@ -68,7 +68,7 @@ export default {
 
             if (this.photo !== null) {
                 const formData = new FormData();
-                formData.append('photo', this.photo[0]);
+                formData.append('photo', this.photo);
                 await axios.post(`users/me/upload`, formData).then(response => {
                     console.log(response.data)
                     this.user = response.data.user
@@ -91,7 +91,6 @@ export default {
     },
     async created() {
         await axios.get('users/me').then(response => {
-            console.log(response.data)
             if (response.data.status === true) {
                 this.user = response.data.user
                 this.username = this.user.username
