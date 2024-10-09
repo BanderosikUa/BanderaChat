@@ -1,4 +1,5 @@
 import json
+import datetime
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 
@@ -9,6 +10,10 @@ from src.chat.schemas import MessageCreate, WsData, User, UserEmbedded
 from src.chat.crud import create_message
 from src.chat import crud, schemas, services
 
+def serialize_datetime(obj): 
+    if isinstance(obj, datetime.datetime): 
+        return obj.isoformat() 
+    raise TypeError("Type not serializable") 
 
 class WebSocketManager:
     actions: list[str] = []
@@ -63,9 +68,9 @@ class ConnectionManager(WebSocketManager):
     async def on_online(self, *, ws: WebSocket,
                         data: dict, db: Session = None) -> None:
         user = data['user']
-        user = UserEmbedded(**(user.dict()))
+        user = UserEmbedded.from_orm(user)
         await self.broadcast({'action': 'online', 
-                              'user': json.loads(user.json())})
+                              'user': user.dict()})
         
     async def on_error(self, *, ws: WebSocket,
                        data: dict, db: Session = None) -> None:
@@ -76,22 +81,22 @@ class ConnectionManager(WebSocketManager):
     async def join(self, *, ws: WebSocket,
                    data: dict, db: Session = None) -> None:
         user = data["user"]
-        user = UserEmbedded(**(user.dict()))
+        user = UserEmbedded.from_orm(user)
         
         await self.broadcast({'action': 'join',
-                              "user": json.loads(user.json()),
+                              "user": user.dict(),
                               'message': f"{user.username} join the chat"})
 
     async def close(self, *, ws: WebSocket,
                     data: dict, db: Session = None) -> None:
         user = data["user"]
         
-        user = UserEmbedded(**(user.dict()))
+        user = UserEmbedded.from_orm(user)
         
         await self.broadcast_exclude(
             [ws],
             {'action': 'disconnect', 
-             "user": json.loads(user.json()),
+             "user": user.json(),
              'message': f"{user.username} has disconnected"}
         )
         await self.disconnect(ws)
@@ -108,12 +113,12 @@ class ConnectionManager(WebSocketManager):
         message = schemas.MessageResponse.from_orm(message)
         message.type = "other"
         
-        user = UserEmbedded(**(user.dict()))
+        user = UserEmbedded.from_orm(user)
         
         await self.broadcast_exclude([ws], {
             'action': 'newMessage',
             'user': json.loads(user.json()),
-            'message': json.loads(message.json())
+            'message': json.loads(message.json()),
         })
                 
 manager = ConnectionManager()

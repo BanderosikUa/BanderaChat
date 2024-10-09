@@ -21,7 +21,6 @@ from src.user.schemas import User
 router = APIRouter()
 
 
-
 @router.websocket("/chats/{chat_id}/ws")
 async def websocket_endpoint(websocket: WebSocket,
                              chat: schemas.Chat = Depends(websocket_valid_chat),
@@ -49,11 +48,11 @@ async def websocket_endpoint(websocket: WebSocket,
             
             await manager.on_receive(ws=websocket, data=data, db=db)
     except WebSocketDisconnect as e:
-        LOGGER.info(str(e))
+        LOGGER.opt(exception=True).error(e)
         LOGGER.info(f"{user.id} disconnected in {chat.id} chat")
         await manager.disconnect(websocket)
     except Exception as e:
-        LOGGER.info(str(e))
+        LOGGER.opt(exception=True).error(e)
         data["error"] = str(e)[:50]
         await manager.on_error(ws=websocket, data=data, db=db)
         
@@ -67,13 +66,14 @@ async def create_chat(request: Request,
     
     return {'status': True, 'chat': chat}
 
+
 @router.post("/chats/{chat_id}/upload")
 async def upload_photo_to_chat(request: Request,
                                chat: schemas.Chat = Depends(valid_chat),
                                photo: UploadFile = File(...),
                                user: User = Depends(required_user),
                                db: Session = Depends(get_db)) -> schemas.ChatResponse:
-    chat = schemas.ChatUpdate(**(chat.dict()))
+    chat = schemas.ChatUpdate.from_orm(chat)
     extension = photo.filename.split(".")[-1]
     
     if extension not in ["jpg", "jpeg", "png"]:
@@ -87,7 +87,6 @@ async def upload_photo_to_chat(request: Request,
     return {"status": True, "chat": chat}
     
 
-    
 @router.get("/chats")
 async def get_users_chats(request: Request,
                           pagination: PaginationParams = Depends(),
@@ -98,9 +97,6 @@ async def get_users_chats(request: Request,
     
     return {"status": True, "chats": chats}
 
-# @router.get("/chats/{chat_id}")
-# async def get_chat(chat = Depends(valid_chat)) -> schemas.ChatResponse:
-#     return {"status": True, "chat": chat}
 
 @router.get("/chats/{chat_id}")
 async def get_chat_detail(request: Request,

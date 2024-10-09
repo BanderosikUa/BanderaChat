@@ -26,6 +26,9 @@ class ChatUpdate(ChatBase):
     id: int
     is_direct: bool
     
+    class Config:
+        orm_mode = True
+    
 class Chat(ChatBase, metaclass=AllOptional):
     id: int
     is_direct: bool
