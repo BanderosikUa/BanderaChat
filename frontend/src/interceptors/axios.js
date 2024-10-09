@@ -5,7 +5,7 @@ axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
 axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('access_token');
 
 
-axios.defaults.baseURL = 'http://localhost:5002';  // the FastAPI backend
+axios.defaults.baseURL = '/api';  // the FastAPI backend
 
 let refresh = false;
 

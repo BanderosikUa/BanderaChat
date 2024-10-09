@@ -1,7 +1,7 @@
 import json
 
 import fastapi.openapi.utils as fu
-from fastapi import FastAPI
+from fastapi import FastAPI, APIRouter
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError, ValidationError, HTTPException
@@ -51,7 +51,11 @@ async def validation_exception_handler(request, exc: RequestValidationError|Cust
 
     return JSONResponse(response, status_code=422)
 
-app.include_router(auth_router, prefix="/auth", tags=["Auth"])
-app.include_router(chat_router, tags=["Chat"])
-app.include_router(user_router, prefix="/users", tags=["User"])
-app.mount("/media", StaticFiles(directory=MEDIA_DIR.as_posix()), name="media")
+router = APIRouter(prefix='/api')
+
+router.include_router(auth_router, prefix="/auth", tags=["Auth"])
+router.include_router(chat_router, tags=["Chat"])
+router.include_router(user_router, prefix="/users", tags=["User"])
+
+app.include_router(router)
+app.mount("/api/media", StaticFiles(directory=MEDIA_DIR.as_posix()), name="media")
