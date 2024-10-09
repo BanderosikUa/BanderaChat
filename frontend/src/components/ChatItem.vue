@@ -192,7 +192,12 @@ export default {
 
       console.log("Starting connection to WebSocket Server")
       const vm = this;
-      this.connection = new WebSocket(`${this.$config.wsUrl}/chats/${this.$route.params.id}/ws?token=${localStorage.getItem('access_token')}`)
+
+      var url = new URL(`/api/chats/${this.$route.params.id}/ws`, window.location.href);
+      url.searchParams.append('token', localStorage.getItem('access_token'))
+
+      url.protocol = url.protocol.replace('http', 'ws');
+      this.connection = new WebSocket(url.href)
 
       // Send ping message periodically
       const pingInterval = setInterval(() => {

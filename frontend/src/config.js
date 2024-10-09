@@ -1,6 +1,5 @@
 const config = {
-    wsUrl: 'ws://localhost:82',
-    imageUrl: 'http://localhost:82/api/media/',
+    imageUrl: '/api/media/',
 }
   
 // if (process.env.NODE_ENV === 'production') {
