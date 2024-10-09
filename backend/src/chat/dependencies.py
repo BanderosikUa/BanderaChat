@@ -34,7 +34,7 @@ async def valid_chat(chat_id: int,
     if not chat:
         raise ChatNotFound
     
-    chat = Chat.from_orm(chat)
+    # chat = Chat.from_orm(chat)
     if user not in chat.participants:
         raise ChatPermissionRequired()
     
