@@ -31,7 +31,7 @@
                             <!-- <img 
                                 src="https://i.pinimg.com/736x/80/17/86/80178693d1d0c7e0ec688707b02ecc0b.jpg"
                                 class="rounded-circle" alt="avatar"> -->
-                            <img :src="chat.photo" class="rounded-circle" alt="avatar">
+                            <img :src="getImageUrl(chat.photo)" class="rounded-circle" alt="avatar">
                         </figure>
                         <div class="users-list-body">
                             <h5>{{ chat.title }}</h5>
@@ -68,6 +68,7 @@ import ChatCreatePopup from './ChatCreatePopup.vue'
 import ProfileDialog from './ProfileDialog.vue'
 // import Swal from 'sweetalert2';
 import vSelect from 'vue-select'
+import { getImageUrl } from "./utils"
 
 export default {
     components:{
@@ -92,6 +93,7 @@ export default {
         }
     },
     methods: {
+        getImageUrl,
         selectChat(chat) {
             console.log(chat)
             this.$router.push({ name: 'chat-detail', params: { id: chat } });

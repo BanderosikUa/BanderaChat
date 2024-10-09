@@ -6,7 +6,7 @@
         <div class="chat-header">
           <div class="chat-header-user">
             <figure class="avatar avatar-state-success">
-              <img :src="chat.photo" class="rounded-circle" alt="avatar">
+              <img :src="getImageUrl(chat.photo)" class="rounded-circle" alt="avatar">
             </figure>
             <div>
               <h5>{{ chat.title }}</h5>
@@ -54,7 +54,7 @@
         <div class="chat-header">
           <div class="chat-header-user">
             <figure class="avatar avatar-state-success">
-              <img :src="chat.photo" class="rounded-circle" alt="avatar">
+              <img :src="getImageUrl(chat.photo)" class="rounded-circle" alt="avatar">
             </figure>
             <div>
               <h5>{{ chat.title }}</h5>
@@ -111,6 +111,7 @@
 // import io from 'socket.io-client'
 import axios from 'axios'
 import MessageItem from "@/components/MessageItem.vue"
+import { getImageUrl } from "./utils"
 
 
 export default {
@@ -153,6 +154,7 @@ export default {
   },
   // computed: { key () { if(this.$route.name == 'chat-detail') { return this.$route.name } else { return this.$route.fullPath } } },
   methods: {
+    getImageUrl,
     async sendMessage() {
       if (this.newMessage.trim() !== '') {
         const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -211,6 +213,7 @@ export default {
         let data = JSON.parse(event.data)
         if (data.action === "newMessage") {
           vm.messages.push({ message: data.message.message, created_at: data.message.created_at, type: data.message.type, user: data.user })
+          vm.scrollDown()
         }
       }
 
