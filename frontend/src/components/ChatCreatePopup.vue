@@ -54,7 +54,7 @@ export default {
         if (response.data.status === true) {
           if (this.photo !== null) {
             const formData = new FormData();
-            formData.append('photo', this.photo[0]);
+            formData.append('photo', this.photo);
             await axios.post(`chats/${response.data.chat.id}/upload`, formData).then(response => {
               console.log(response.data)
               this.chat = response.data.chat
